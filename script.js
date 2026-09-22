@@ -72,7 +72,7 @@ let CONFIG = {
   },
 
   scratch: {
-    heading: 'With immense joy and love',
+    heading: 'Two days, one beautiful beginning',
     cta:     'Scratch to reveal',
   },
 
@@ -81,7 +81,9 @@ let CONFIG = {
     name:    'Amaraa Farms',
     /* Reverse-geocoded from the Maps link below, NOT supplied by the
        family — worth having them confirm it before the cards go out. */
-    address: 'Arjunganj, Lucknow,<br />Uttar Pradesh 226002',
+    /* MISSING — the full postal address. This is only what the couple's
+       own announcement says; the pin below is exact, the wording is not. */
+    address: 'Arjunganj, Lucknow',
     mapUrl:  'https://maps.app.goo.gl/FvnkfV8fd2BBWL3q8',
     /* Google's keyless embed form. Coordinates come from the link above,
        so the pin lands on the farm itself rather than on a name search. */
@@ -155,7 +157,9 @@ let CONFIG = {
 
   /* One page per side, each built from its own list below. */
   blessings: {
-    note: 'With the love and good wishes of our families.',
+    /* MISSING — the line under the Blessings heading. The one here was the
+       previous card's, so it is empty, which hides it. */
+    note: '',
     bride: [
       {
         title: 'With Best Compliments',
@@ -197,7 +201,7 @@ const SIDE = document.documentElement.dataset.inviteSide === 'groom' ? 'groom' :
    link whose name and address disagree with the pin sends guests astray. */
 const AMARAA = {
   name: 'Amaraa Farms',
-  address: 'Arjunganj, Lucknow,<br />Uttar Pradesh 226002',
+  address: 'Arjunganj, Lucknow',
   mapUrl: 'https://maps.app.goo.gl/FvnkfV8fd2BBWL3q8',
   lat: 26.7993442, lng: 80.9897956,
 };
@@ -213,9 +217,11 @@ const EVENT_VENUES = {
 const SIDE_CONFIGS = {
   bride: {
     names: 'Mahima & Ayush', order: ['bride', 'groom'], blessings: true,
-    /* Her card opens on a Shrinathji pichwai where the other carries the
-       ॐ. Only this side has one; leave it off and the glyph stands. */
-    markImage: 'assets/hero/nathji.jpg',
+    /* markImage puts a painting in the gold ring instead of CONFIG.hero.mark,
+       and the ring opens out into a framed panel for it. The previous card
+       had a pichwai here, which was that family's; with none, both sides show
+       the ॐ their own announcement uses. Drop an image in assets/hero/ and
+       name it here to change that. */
     events: ['haldi', 'sangeet', 'wedding'], rsvp: CONFIG.rsvp.bride,
     venue: AMARAA,
   },
@@ -714,7 +720,7 @@ function renderRsvp() {
   if (!host) return;
 
   /* No numbers for this side means no RSVP at all: a heading, a rule and
-     "we are only a call away" with nothing under them is worse than
+     the line under it with nothing beneath them is worse than
      silence. Fill in CONFIG.rsvp and the section returns by itself. */
   const contacts = CONFIG.rsvp.bride;
   if (!contacts || !contacts.length) {

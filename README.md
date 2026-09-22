@@ -65,21 +65,29 @@ Conventions worth knowing:
 
 ## Still missing
 
-These are what is outstanding — see the `MISSING` comments in `script.js`:
+**[`DETAILS-NEEDED.md`](DETAILS-NEEDED.md) is the full list** — what is
+outstanding, what was deleted because it belonged to the card this was cloned
+from, what is still borrowed from it, and what was assumed rather than given.
+The short version:
 
 | | |
 | --- | --- |
 | RSVP contact numbers | none supplied for either side, so the RSVP section removes itself from both cards |
-| Bride's grandparents | only the parents' line (`D/O …`) was supplied |
-| Groom's father / grandparents | only the mother's name was supplied, so the groom's hero line reads `S/O Smt. Gayatri Srivastava` |
-| Amaraa Farms address | reverse-geocoded from the Maps link, not supplied — worth confirming |
-| `assets/og/og.jpg` | still the previous couple's share card; needs re-composing before links are shared |
+| The year | assumed **2026**, which makes the Wedding a Tuesday — confirm |
+| Amaraa Farms postal address | only "Arjunganj, Lucknow" is on record; the map pin is exact |
+| Grandparents, and the groom's father | only the parents' names were supplied |
+| `assets/og/og.jpg`, `favicon.png`, `apple-touch-icon.png`, `assets/scratch/couple.webp` | deleted — each carried the previous couple's name or monogram. Nothing points at them; the head comments say how to put each back. |
 
-One thing was inferred rather than given:
+Everything outstanding is also marked `MISSING` in a comment in `script.js`.
 
-- **The year is 2026.** The source invitation gave only "23rd / 24th
-  November". 2026 is the next occurrence, which puts the Haldi and Sangeet on
-  a Monday and the Wedding on a Tuesday. Confirm before the cards go out.
+### Cloned from another card
+
+This started as the invitation for a different couple. Their names, venue,
+dates, wording and artwork have all been taken out, and
+`tests/invitation-pages.test.js` fails if any of it creeps back. What remains
+of theirs is decorative and carries nobody's name — the floral ground, the
+three function films and the score — and is listed in `DETAILS-NEEDED.md` §3
+so it can be replaced deliberately rather than forgotten.
 
 ## One invitation, many links
 
@@ -147,10 +155,9 @@ and ends on the Amaraa Farms sign revealed beyond them. That last frame is the
 hand-off to the hero, so the gate runs the film out and hands over on its own
 `ended` event rather than cutting it short.
 
-It replaced two films that were different per side: the Rumi Darwaza on the
-bride's card and a sealed envelope on the groom's. Both are still in
-`assets/video/` (`opening.mp4`, `envelope-opening.mp4`) and nothing references
-them.
+It replaced two films that were different per side, both from the cloned card:
+a Rumi Darwaza on the bride's and a sealed envelope on the groom's. Both have
+been deleted.
 
 A film is laid out at **its own aspect ratio**, or the element letterboxes
 inside its box and the gate shows side bands. `data-shape="portrait"` picks
@@ -180,9 +187,11 @@ that does nothing.
 
 ## The hero card
 
-What the gate opens onto: eyebrow, the mark in a gold ring (a Shrinathji
-pichwai on the bride's side, ॐ on the groom's), the names in **Pinyon
-Script**, the invitation sentence, and the dates between gold rules. The
+What the gate opens onto: eyebrow, ॐ in a gold ring, the names in **Pinyon
+Script**, the invitation sentence, and the dates between gold rules. Setting
+`markImage` on a side puts a painting in that ring instead and opens it out
+into a framed panel; nothing ships with one, because the painting that was
+here belonged to the family this card was cloned from. The
 palette lives in its own tokens — `--card-ground`, `--deep-ink`, `--olive-ink`,
 `--gold-ink` — kept apart from the watercolour tokens that dress the gate,
 blessings, RSVP and countdown.
@@ -241,8 +250,13 @@ re-composed from it and cannot be re-cut from the derived WebP.
 
 `music/ishq-hai.mp3` comes in at **0:38** — `MUSIC_START` in `script.js` — and
 the `<audio>` carries no `loop`, because looping natively would drop back to 0
-and replay the intro; the loop is re-seeded on `ended` instead.
+and replay the intro; the loop is re-seeded on `ended` instead. **It is the
+previous couple's track**; a different song needs `MUSIC_START` changed or
+removed, and deleting the file simply hides the music button.
 
-`assets/video/hawan-bg.mp4`, `mehendi-bg.mp4` and `reception-bg.mp4` and their
-stills are **unused** — they belonged to functions this celebration does not
-have. They are kept in case a function is added back.
+Nothing in `assets/` is unreferenced. The films and stills for functions this
+celebration does not have — Hawan, Mehendi, Reception — were deleted along with
+the two retired gate films, which is about 25 MB of the previous card's media.
+`gate.mp4` and `gate_poster.jpg` are the only media supplied for this
+invitation; see [`DETAILS-NEEDED.md`](DETAILS-NEEDED.md) §3 for what is still
+borrowed.

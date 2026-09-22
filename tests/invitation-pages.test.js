@@ -45,6 +45,38 @@ for (const [what, src] of everything) {
                       'the previous couple must not linger in ' + what);
 }
 
+/* ── nor may their artwork. Every one of these carried their names, their
+      monogram or their family's choice; a wrong picture on a share card or
+      a browser tab is worse than none, so each is DELETED rather than
+      swapped for a placeholder, and the markup must not reach for it. ── */
+for (const f of ['assets/og/og.jpg',            // "Radhika & Raghav", RR monogram
+                 'favicon.png',                 // RR monogram
+                 'apple-touch-icon.png',        // RR monogram
+                 'assets/scratch/couple.webp',  // their illustrated couple
+                 'assets/hero/nathji.jpg']) {   // the pichwai their side chose
+  assert.ok(!has(f), f + ' is the previous card’s and must stay deleted');
+}
+for (const [name, page] of pages) {
+  const markup = page.replace(/<!--[\s\S]*?-->/g, '');   // the comments name them on purpose
+  assert.doesNotMatch(markup, /og:image|twitter:image/,
+                      name + ' must not point a share card at a missing or borrowed image');
+  assert.doesNotMatch(markup, /favicon\.png|apple-touch-icon\.png|couple\.webp|nathji/,
+                      name + ' must not reach for deleted artwork');
+  assert.match(markup, /<meta name="twitter:card" content="summary"/,
+               name + ' drops to the no-image card while there is no og:image');
+}
+assert.doesNotMatch(script, /markImage: '/, 'no side may name artwork that does not ship');
+
+/* ── and no wording lifted from that card ── */
+for (const [what, src] of everything) {
+  assert.doesNotMatch(src.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, ''),
+                      /With immense joy and love|only a call away|good wishes of our families/i,
+                      'copy from the cloned card must not linger in ' + what);
+}
+
+/* ── a postcode nobody supplied is a postcode nobody can trust ── */
+assert.doesNotMatch(script, /226002/, 'the venue postcode was inferred, not given');
+
 /* ── Confirm Your Presence is GONE, not merely switched off: the form, its
       styling, its glyphs, its link parameter and its builder tick box ── */
 for (const [what, src] of everything) {

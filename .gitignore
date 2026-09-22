@@ -29,3 +29,8 @@ Thumbs.db
 desktop.ini
 
 *.log
+
+# The exported Claude Code chat for this project. A backup copy of the
+# transcript that lives in ~/.claude/projects/; it is this conversation, not
+# part of the site, and the repo is public.
+.claude-session/

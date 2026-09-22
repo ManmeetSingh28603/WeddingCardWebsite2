@@ -617,7 +617,9 @@ video.intro-film::-webkit-media-controls-enclosure { display: none !important; }
   96%           { transform: translateX(3px); }
 }
 
-/* The couple, standing under the bar. */
+/* The couple, standing under the bar. No image ships with the card —
+   the one that did was the previous couple's — but this is what styles the
+   replacement the moment one is dropped in. */
 .scratch-couple {
   position: relative;
   z-index: 1;

@@ -10,26 +10,26 @@
   <meta name="description" content="With love, Mahima &amp; Ayush invite you to celebrate their wedding at Amaraa Farms, Lucknow." />
 
   <!-- Share card for WhatsApp, iMessage and the rest.
-       og:url and og:image MUST be absolute — a relative path here is the
-       usual reason a shared link comes through with no picture. Change the
-       host below if the invitation ever moves off GitHub Pages. -->
+       There is NO og:image. The one that was here was the previous card's —
+       another couple's names and venue — and a wrong picture is worse than
+       none: a link with no image still shows the title and the line below
+       it. Drop a 1200x630 jpg at assets/og/og.jpg and add og:image,
+       og:image:width/height and twitter:image back, absolute (a relative
+       path is the usual reason a shared link comes through with no
+       picture). Change the host below if the invitation ever moves off
+       GitHub Pages. -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mahima &amp; Ayush" />
   <meta property="og:title" content="Mahima &amp; Ayush — Wedding Invitation" />
   <meta property="og:description" content="With love, Mahima &amp; Ayush invite you to celebrate their wedding at Amaraa Farms, Lucknow." />
   <meta property="og:url" content="https://manmeetsingh28603.github.io/WeddingCardWebsite2/" />
-  <meta property="og:image" content="https://manmeetsingh28603.github.io/WeddingCardWebsite2/assets/og/og.jpg" />
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Mahima &amp; Ayush — Amaraa Farms, Lucknow" />
-  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Mahima &amp; Ayush — Wedding Invitation" />
-  <meta name="twitter:description" content="Amaraa Farms, Lucknow · 23–24 November 2026" />
-  <meta name="twitter:image" content="https://manmeetsingh28603.github.io/WeddingCardWebsite2/assets/og/og.jpg" />
+  <meta name="twitter:description" content="With love, Mahima &amp; Ayush invite you to celebrate their wedding at Amaraa Farms, Lucknow." />
 
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <!-- No favicon or touch icon either: both were the previous card's RR
+       monogram. Drop a 32x32 favicon.png and a 180x180 apple-touch-icon.png
+       in the root and link them back here. -->
 
   <!-- Italiana = the couple's names · Cinzel = display caps ·
        Cormorant Garamond = body · DM Sans = eyebrows and small caps ·
@@ -164,7 +164,7 @@
     <canvas class="sand-canvas" id="sandCanvas" aria-hidden="true"></canvas>
 
     <div class="scratch-card">
-      <p class="scratch-heading" data-scratch-heading>With immense joy and love</p>
+      <p class="scratch-heading" data-scratch-heading>Two days, one beautiful beginning</p>
 
       <div class="scratch-bar" id="scratchFrameWrap">
         <div class="scratch-reveal" id="scratchReveal" aria-live="polite">
@@ -182,9 +182,10 @@
         <div class="scratch-glint" id="scratchGlint" aria-hidden="true"></div>
       </div>
 
-      <img class="scratch-couple" src="assets/scratch/couple.webp" alt=""
-           draggable="false" loading="lazy" decoding="async"
-           onerror="this.style.display='none'" />
+      <!-- An illustration of the couple stood here. It was the previous
+           card's, so it is gone. Put a transparent PNG or WebP at
+           assets/scratch/couple.webp and restore the <img> — .scratch-couple
+           still styles it. -->
 
       <p class="scratch-hashtag" id="scratchHashtag" data-hashtag></p>
     </div>
@@ -271,7 +272,7 @@
       </div>
       <h2 class="rsvp-heading">RSVP</h2>
       <div class="rsvp-sub-rule" aria-hidden="true"></div>
-      <p class="rsvp-note">We are only a call away &mdash; for timings, travel, or anything at all.</p>
+      <p class="rsvp-note">For timings, travel, or anything at all &mdash; please call.</p>
       <div id="rsvpLists"></div>
 
       <!-- A plain anchor, with the real URL in the markup: the venue has to
