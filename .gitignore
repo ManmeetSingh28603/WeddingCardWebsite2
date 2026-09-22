@@ -34,3 +34,7 @@ desktop.ini
 # transcript that lives in ~/.claude/projects/; it is this conversation, not
 # part of the site, and the repo is public.
 .claude-session/
+
+# The draft message to the family, and anything they reply into it. Their
+# phone numbers will end up here; the repo is public.
+message-to-client.txt
