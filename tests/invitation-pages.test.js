@@ -13,13 +13,11 @@ for (const f of ['index.html', 'bride.html', 'groom.html',
 }
 
 /* ── the media each gate and each filmed card actually needs ── */
-for (const f of ['assets/video/opening.mp4',            // bride gate
-                 'assets/video/envelope-opening.mp4',   // groom gate
+for (const f of ['assets/video/gate.mp4',               // the gate, both cards
+                 'assets/hero/gate_poster.jpg',         // and its held first frame
                  'assets/video/haldi-mehendi-bg.mp4',   // Haldi card
                  'assets/video/sangeet-bg.mp4',         // Sangeet card
                  'assets/video/wedding-bg.mp4',         // Wedding card
-                 'assets/hero/opening_poster.webp',
-                 'assets/hero/envelope_poster.jpg',
                  'assets/music/ishq-hai.mp3']) {
   assert.ok(has(f), f + ' must exist');
 }
@@ -67,13 +65,22 @@ assert.match(script, /document\.getElementById\('rsvp'\)\?\.remove\(\);/,
 assert.match(script, /rsvp: \{\s*bride: \[\],\s*groom: \[\],\s*\}/,
              'no numbers were supplied for either side');
 
-/* ── both gates are films, and each has its own ── */
-assert.match(bride, /assets\/video\/opening\.mp4/, 'bride opens on the Rumi Darwaza film');
-assert.match(groom, /assets\/video\/envelope-opening\.mp4/, 'groom opens on the envelope film');
-assert.match(groom, /data-shape="portrait"/, 'the groom film is portrait and is cropped as such');
-assert.match(groom, /data-film-end="5"/, 'a later cut lets the blue backdrop through');
+/* ── one gate film, on both cards, cropped as the portrait it is ── */
 for (const [name, page] of pages) {
   assert.match(page, /<video class="intro-film"/, name + ' needs a gate film');
+  assert.match(page, /src="assets\/video\/gate\.mp4"/, name + ' opens on the gate film');
+  assert.match(page, /poster="assets\/hero\/gate_poster\.jpg"/, name + ' needs the held first frame');
+  assert.match(page, /data-shape="portrait"/, name + ' film is portrait and is cropped as such');
+  assert.doesNotMatch(page, /opening\.mp4|envelope-opening\.mp4|opening_poster|envelope_poster/,
+                      name + ' must not still reach for a retired gate');
+  /* The gate ends on the venue reveal, so it runs out rather than being cut
+     short. A data-film-end here would throw away the hand-off. */
+  assert.doesNotMatch(page, /data-film-end/, name + ' must run the gate film to its end');
+  /* The film carries no wording of its own, so this is the whole
+     instruction — the groom's card went without it while his gate was the
+     envelope, which had "Tap to open" printed into it. */
+  assert.match(page, /class="intro-prompt"[\s\S]{0,260}intro-prompt-text/,
+               name + ' gate would have nothing telling a guest to tap');
 }
 
 /* ── the CSS envelope that the groom's film replaced is gone ── */

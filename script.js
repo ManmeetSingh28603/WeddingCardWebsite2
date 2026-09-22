@@ -1103,12 +1103,12 @@ function initIntro() {
       }, 1400);
     }
 
-    /* The bride's film closes on the hotel revealed through the open gate —
-       that last frame is the hand-off. The groom's runs on past the moment
-       that matters, into the backdrop its source template used, so it
-       carries data-film-end and hands over on the light blowing out of the
-       envelope instead. Paused there, so the held frame — the brightest in
-       the film — is what the dissolve fades out of. */
+    /* The gate film closes on the venue revealed through the open doors —
+       that last frame is the hand-off, so both cards simply run it out and
+       hand over on 'ended'.
+       data-film-end is the escape hatch for a film that runs on past the
+       moment that matters: it pauses there and hands over instead. No card
+       sets it today; the envelope film that needed it did. */
     const cutAt = parseFloat(film.dataset.filmEnd);
     const cut = Number.isFinite(cutAt) && cutAt > 0 ? cutAt : null;
     if (cut) {

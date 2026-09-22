@@ -139,29 +139,43 @@ dim.
 
 Escape, the × button, and a tap on the backdrop all close.
 
-## The two gates
+## The gate
 
-They are deliberately different films:
+**Both cards open on the same film**, `assets/video/gate.mp4` — 720×1280
+portrait, ten seconds. It starts on the closed doors, pushes through the arch
+and ends on the Amaraa Farms sign revealed beyond them. That last frame is the
+hand-off to the hero, so the gate runs the film out and hands over on its own
+`ended` event rather than cutting it short.
 
-- **Bride** — the Rumi Darwaza (`assets/video/opening.mp4`), handing over on
-  its own `ended` event.
-- **Groom** — the sealed envelope (`assets/video/envelope-opening.mp4`), a
-  portrait film cut at `data-film-end="5"`; a later cut lets the source's own
-  blue backdrop through.
+It replaced two films that were different per side: the Rumi Darwaza on the
+bride's card and a sealed envelope on the groom's. Both are still in
+`assets/video/` (`opening.mp4`, `envelope-opening.mp4`) and nothing references
+them.
 
-Both are laid out at **their own aspect ratio**, or the element letterboxes
-inside its box and the gate shows side bands. Swap in a film of another shape
-and the `aspect-ratio` and the `width: max(…)` that keeps it covering the
-screen move together.
+A film is laid out at **its own aspect ratio**, or the element letterboxes
+inside its box and the gate shows side bands. `data-shape="portrait"` picks
+the portrait geometry; swap in a film of another shape and the `aspect-ratio`
+and the `width: max(…)` that keeps it covering the screen move together.
 
-**Neither film carries wording**, so `.intro-prompt` is the only thing telling
-a guest to tap. It is not decoration. Once the gate is plainly moving the
-prompt turns into "Tap to skip" — and because one physical tap fires
+The source burns a **sparkle in the bottom-right corner**, so the portrait rule
+cuts 15% off the bottom — checked against the first frame and the last — and
+pushes the element down by half the cut to re-centre what survives it. Taking
+it off the right instead would cost much more of the arch.
+
+**The film carries no wording**, so `.intro-prompt` is the only thing telling a
+guest to tap. It is not decoration. The groom's card went without it while his
+gate was the envelope, which had "Tap to open" printed into the frame; it is
+back now that both cards share a silent film. Once the gate is plainly moving
+the prompt turns into "Tap to skip" — and because one physical tap fires
 `pointerdown`, then `touchend`, then `click`, `SKIP_AFTER_MS` is the grace
 window that stops that cascade opening the gate and slamming it in the same
 gesture.
 
-If a film fails to load, the gate removes itself rather than leaving a tap
+`data-film-end` is the escape hatch for a film that runs on past the moment
+that matters — it pauses there and hands over instead. No card sets it today;
+the envelope film needed it, because its source cut to a blue backdrop.
+
+If the film fails to load, the gate removes itself rather than leaving a tap
 that does nothing.
 
 ## The hero card

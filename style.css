@@ -169,12 +169,12 @@ html, body {
   -webkit-user-drag: none;
 }
 
-/* The groom's film — assets/video/envelope-opening.mp4, 720x1280 portrait.
-   Its mark sits in the bottom-right corner with its top edge 12.19% up
-   from the bottom, so here the cheap cut is off the BOTTOM: 15% clears it
-   with 36px of the source to spare, where taking it off the right instead
-   would cost 21.7%. Only one edge is cut, so the element is pushed DOWN by
-   half the cut to re-centre what survives it.
+/* The gate film — assets/video/gate.mp4, 720x1280 portrait, on both cards.
+   Its generator's sparkle sits in the bottom-right corner, so here the cheap
+   cut is off the BOTTOM rather than off both sides: 15% clears the mark on
+   the first frame and on the last, checked against both. Only one edge is
+   cut, so the element is pushed DOWN by half the cut to re-centre what
+   survives it.
      visible height = H * (1 - 0.15) = H * 0.85  ->  H >= 100svh / 0.85 = 117.65svh
      element width  = H * 720/1280               ->  W >= 66.18svh, and >= 100% */
 .intro-film[data-shape="portrait"] {
