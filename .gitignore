@@ -1,0 +1,31 @@
+# Source media, kept out of the repo.
+# The site serves the derived files in assets/ — the section stills cut from
+# the videos, the score copied to assets/music/. The originals stay on disk
+# so those can be regenerated, but they are weight the published site never
+# loads. Anchored to the root with a leading slash so nothing under assets/
+# is caught.
+/*.mp4
+/*.mp3
+/*.jpeg
+/*.jpg
+
+# Reference material and source artwork dropped in the root. background.png
+# is the 5 MB landscape floral the hero frame was re-composed from;
+# scratch.png and test1.jpeg are screenshots of the designs being matched.
+# Named one by one rather than /*.png, which would swallow the favicons.
+/background.png
+/scratch.png
+
+# Working document for the client. Carries the families' mobile numbers and
+# is not part of the site — keep it out of a public repo.
+wedding-details.txt
+
+# Playwright MCP scratch output
+.playwright-mcp/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+*.log

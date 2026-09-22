@@ -1,0 +1,2106 @@
+/* ============================================================
+   Wedding invitation — Amaraa Farms, Lucknow
+   Intro gate · Hero card · Scratch-to-reveal · Save the dates ·
+   Venue · Blessings · RSVP · Countdown · Music
+
+   Palette taken from the crest artwork: pale rose sky, Amer
+   sandstone, bougainvillea pink, peacock teal, terracotta ink.
+
+   Where the original invitation used painted artwork that was not
+   supplied (section grounds, boughs, the garden floor), the ground
+   is painted here in layered gradients instead. Every one of those
+   is marked "painted ground" — drop a real image in and delete the
+   gradient when artwork arrives.
+   ============================================================ */
+
+:root {
+  --sky:        #f4ecf4;
+  --ivory:      #fdf6ec;
+  --ivory-warm: #f8ecd9;
+  --sand:       #e3c79a;
+  --sand-deep:  #c9a469;
+  --gold:       #c08a3e;
+  --gold-soft:  #dcb473;
+  --gold-deep:  #a06a1f;
+  --terra:      #9c4a1c;
+  --terra-deep: #7c380f;
+  --bougain:    #e07a9e;
+  --bougain-dp: #c2547c;
+  --peacock:    #1f6f6b;
+  --crimson:    #a4213c;
+  --ink:        #4a3524;
+  --ink-soft:   #86664a;
+
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-caps:    "Cinzel", "Cormorant Garamond", Georgia, serif;
+  --font-script:  "Pinyon Script", "Brush Script MT", cursive;
+  /* The couple's names and the opened cards' titles. Italiana is the face
+     the reference invitation sets its names in — high contrast, very light
+     weight, so it wants size and negative tracking to read as intended. */
+  --font-name:    "Italiana", "Cormorant Garamond", Georgia, serif;
+  --font-sans:    "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* The invitation-card palette, taken from the reference: deep olive ink
+     on warm paper, with gold for every rule and eyebrow. Kept separate
+     from the watercolour tokens above, which still dress the intro gate,
+     blessings, RSVP and countdown. */
+  --card-ground:  #f7f2ea;
+  --deep-ink:     #313b29;
+  --ink-2:        #474936;
+  --olive-ink:    #6d7654;
+  --gold-ink:     #ae8950;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* Hold the scrollbar's gutter open. The intro locks scrolling and releases it
+   as the veil lifts; without this that release shunts the layout sideways at
+   exactly the moment the scene arrives.
+   On html ONLY. Set on body as well, the gutter is reserved twice: the column
+   then centres inside a box ~15px narrower than the one the fixed overlays
+   (.intro-screen, .ivory-dissolve) resolve their 50% against, and the veil
+   sits half a gutter to the right of the invitation it is meant to cover. */
+html { scrollbar-gutter: stable; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-display);
+  overscroll-behavior-x: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* The painted panels. Each is a still cut from the supplied footage with the
+   bottom strip already removed in the pixels — that strip carried the source
+   site's floating control and a screen-recorder watermark. Cropping it here
+   in CSS instead would have to be sized for the worst viewport ratio, and at
+   that depth it takes the fountain and the flowers with it, so the cut was
+   made once in the file.
+   Anchored to the bottom: that is where each painting's subject sits. */
+.plate {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  background: var(--sky);
+}
+
+
+/* ============================================================
+   INTRO  (tap-to-begin gate)
+   ============================================================ */
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #efe3d0;
+  cursor: pointer;
+  opacity: 1;
+  /* The film is sized to overflow this box on purpose — that is how a
+     landscape frame covers a portrait screen. On a phone the viewport
+     clips the spill; on desktop the gate is re-centred onto the 480px
+     column (see the min-width: 600px block) which is NARROWER than the
+     window, so without this the film runs out across the whole page
+     while the scrim and prompt stay in the column. */
+  overflow: hidden;
+  transition: opacity 1400ms ease, filter 1400ms ease, transform 1800ms ease;
+}
+/* painted ground — laid paper the card opens on */
+.intro-paper {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 38%, rgba(255,253,248,.95), transparent 70%),
+    radial-gradient(circle at 18% 16%, rgba(224,122,158,.10), transparent 42%),
+    radial-gradient(circle at 84% 78%, rgba(192,138,62,.12), transparent 46%),
+    linear-gradient(170deg, #fbf1e2 0%, #f4e5d0 52%, #efdcc2 100%);
+}
+.intro-paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .5;
+  background: repeating-linear-gradient(92deg, rgba(150,120,80,.035) 0 1px, transparent 1px 6px);
+}
+/* A gate film IS the gate — shown FULL-BLEED, so it opens across the whole
+   screen rather than inside a letterbox. Both sides run one now.
+
+   Both films carry their generator's watermark, and both are cut off with
+   clip-path, whose percentages resolve against the ELEMENT's own box — so
+   the crop is exact at every viewport, PROVIDED the element is laid out at
+   the film's own aspect ratio. Get that ratio wrong and the box stops
+   describing the picture: the frame letterboxes itself and the gate shows
+   bands down the sides. That is exactly what a portrait 336/896 box did to
+   this landscape film.
+
+   Bride — assets/video/opening.mp4, 1280x720 landscape, arch dead centre.
+   Its sparkle mark sits at x 1137-1182, y 577-622 of the source: 11.17% in
+   from the right edge. 12% clears it, and is taken off BOTH sides even
+   though the mark is only on one — the arch is centred, and shaving a
+   single edge would swing it off axis.
+     visible width  = W * (1 - 2*0.12) = W * 0.76  ->  W >= 100% / 0.76 = 131.58%
+     element height = W * 720/1280                 ->  W >= 100svh * 1.7778 */
+.intro-film {
+  --crop: 12%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: max(133%, calc(100svh * 1.79));
+  aspect-ratio: 1280 / 720;
+  transform: translate(-50%, -50%);
+  clip-path: inset(0 var(--crop));
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* The groom's film — assets/video/envelope-opening.mp4, 720x1280 portrait.
+   Its mark sits in the bottom-right corner with its top edge 12.19% up
+   from the bottom, so here the cheap cut is off the BOTTOM: 15% clears it
+   with 36px of the source to spare, where taking it off the right instead
+   would cost 21.7%. Only one edge is cut, so the element is pushed DOWN by
+   half the cut to re-centre what survives it.
+     visible height = H * (1 - 0.15) = H * 0.85  ->  H >= 100svh / 0.85 = 117.65svh
+     element width  = H * 720/1280               ->  W >= 66.18svh, and >= 100% */
+.intro-film[data-shape="portrait"] {
+  --crop: 15%;
+  width: max(101%, calc(100svh * 0.669));
+  aspect-ratio: 720 / 1280;
+  transform: translate(-50%, calc(-50% + var(--crop) / 2));
+  clip-path: inset(0 0 var(--crop) 0);
+}
+
+/* Warm dusk stone behind the prompt — cream text alone was washing out
+   against the lit sandstone. Sits over the film, under the wording. */
+.intro-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  display: none;
+}
+
+/* The film says nothing on its own, so this is the whole instruction. */
+.intro-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: max(7vh, calc(env(safe-area-inset-bottom, 0px) + 42px));
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  width: min(86%, 400px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.intro-prompt-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(253,246,236,.65), transparent);
+}
+.intro-prompt-text {
+  flex-shrink: 0;
+  font-family: var(--font-caps);
+  font-size: clamp(.68rem, 2.9vw, .8rem);
+  font-weight: 500;
+  letter-spacing: .24em;
+  text-indent: .24em;
+  text-transform: uppercase;
+  color: #fdf6ec;
+  text-shadow: 0 1px 12px rgba(38,20,8,.85), 0 0 3px rgba(38,20,8,.6);
+  animation: introPromptBreathe 2600ms ease-in-out 1500ms infinite;
+}
+@keyframes introPromptIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes introPromptBreathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .58; }
+}
+/* Once the film is running the wording changes to the skip hint and steps
+   back, so it stops competing with the gate for attention. */
+.intro-prompt.is-playing { animation: none; opacity: 1; }
+.intro-prompt.is-playing .intro-prompt-text {
+  animation: none;
+  opacity: .62;
+  font-size: clamp(.6rem, 2.5vw, .7rem);
+  transition: opacity .5s ease;
+}
+.intro-prompt.is-gone { opacity: 0; transition: opacity .45s ease; }
+video.intro-film::-webkit-media-controls,
+video.intro-film::-webkit-media-controls-enclosure { display: none !important; }
+.intro-screen.is-fading {
+  opacity: 0;
+  filter: blur(16px);
+  transform: scale(1.035);
+  pointer-events: none;
+}
+
+
+
+/* Ivory cross-dissolve between the card and the scene. */
+.ivory-dissolve {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 44%, #fffdf8 0%, #fdf6ec 36%, #f6e7d2 66%, #efdcc2 100%);
+}
+.ivory-dissolve::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 42%, rgba(192,138,62,.20), transparent 58%);
+  mix-blend-mode: screen;
+}
+.ivory-dissolve.is-active { animation: ivoryDissolve 2400ms cubic-bezier(.4,0,.2,1) forwards; }
+@keyframes ivoryDissolve {
+  0%   { opacity: 0; transform: scale(1.05); filter: blur(8px); }
+  30%  { opacity: 1; transform: scale(1);    filter: blur(0); }
+  60%  { opacity: 1; transform: scale(1);    filter: blur(0); }
+  100% { opacity: 0; transform: scale(1.07); filter: blur(5px); }
+}
+/* Held veil, used while the crest is in flight. A STATIC opacity, not a
+   keyframe: the hand-off is the heaviest moment on the page, and a keyframe
+   started here can miss its own fade-in and leave the veil transparent while
+   the card fades off it. A static value cannot be skipped. */
+.ivory-dissolve.is-active.is-hold { animation: none; opacity: 1; }
+.ivory-dissolve.is-active.is-hold.is-lifting {
+  opacity: 0;
+  transform: scale(1.05);
+  filter: blur(4px);
+  transition: opacity 1100ms ease, transform 1300ms ease, filter 1100ms ease;
+}
+
+
+/* ============================================================
+   HERO — the invitation card
+
+   Palette and type follow the reference invitation: deep olive ink,
+   gold rules, names in Italiana. The ground is the re-composed floral
+   frame (see README) and is shown light and untreated — the reference
+   only looks dark in a phone screenshot; its own hero is #f5eee3 with
+   #313b29 ink.
+   ============================================================ */
+.hero-screen {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(40px, 7vh, 76px) clamp(22px, 7vw, 40px);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--card-ground);
+  text-align: center;
+}
+/* Sits a little outside the box so the parallax drift never exposes an
+   edge as the hero scrolls away. */
+.hero-frame {
+  position: absolute;
+  inset: -4% -2%;
+  z-index: -2;
+  background: url("assets/hero/floral_frame.webp") center / cover no-repeat;
+  transform: translateY(calc(var(--hero-drift, 0px) * -0.08));
+  will-change: transform;
+}
+/* Lifts the middle just enough to hold text without washing the florals
+   out at the edges, and closes the seam into the section below. */
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 74% 48% at 50% 44%,
+      rgba(252,248,242,.82) 0%, rgba(252,248,242,.42) 55%, rgba(252,248,242,0) 78%),
+    linear-gradient(to bottom, transparent 72%, var(--card-ground) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 560px;
+  animation: heroRise 1500ms cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.hero-eyebrow {
+  margin: 0 0 clamp(18px, 3.4vh, 28px);
+  color: var(--gold-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.58rem, 2.5vw, .68rem);
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-indent: .3em;
+  text-transform: uppercase;
+}
+
+/* The bride's mark is a painting rather than a glyph, so the ring opens
+   out into a framed portrait panel — see .hero-mark--art below. */
+.hero-mark {
+  display: grid;
+  place-items: center;
+  width: 54px; height: 54px;
+  margin: 0 auto clamp(16px, 3vh, 22px);
+  border: 1px solid rgba(174,137,80,.55);
+  border-radius: 50%;
+  color: var(--gold-ink);
+  font-family: var(--font-name);
+  font-size: 30px;
+  line-height: 1;
+}
+.hero-mark--art {
+  width: auto;
+  height: clamp(96px, 17vw, 124px);
+  aspect-ratio: 921 / 1232;
+  padding: 3px;
+  border-radius: 3px;
+  border-color: rgba(174,137,80,.7);
+  background: #fffdf8;
+  box-shadow: 0 7px 20px -12px rgba(49,59,41,.55);
+  overflow: hidden;
+}
+.hero-mark--art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+/* Pinyon Script rather than Italiana: cursive, but a formal copperplate
+   that still reads at a glance — and it is already loaded for the script
+   accents, so it costs no extra font request.
+   line-height was .82, which is where a descender collided with the lineage
+   under it: a joined script hangs long descenders well below the
+   baseline, and a line box shorter than the glyphs has nowhere to put
+   them. 1.02 plus the padding below clears the tail of the g.
+   Negative tracking is gone too — it pulls the joins apart on a script
+   and the letters stop connecting. */
+.hero-names {
+  margin: 0;
+  color: var(--deep-ink);
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(3.6rem, 14.5vw, 6.8rem);
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+.hero-name {
+  display: block;
+  padding-bottom: .1em;   /* the descender's own room, above the lineage */
+}
+.hero-person { display: block; }
+.hero-lineage {
+  display: block;
+  max-width: 24em;
+  /* em here is the LINEAGE size, which is tiny — .6em of it was barely a
+     gap under a 6.8rem name. Set in rem so it stays a real gap. */
+  margin: .85rem auto 0;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-size: clamp(.62rem, 2.45vw, .78rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.32;
+}
+.hero-amp {
+  display: block;
+  margin: .16em 0 .1em;
+  color: var(--gold-ink);
+  font-family: var(--font-display);
+  font-size: .4em;
+  font-style: italic;
+  letter-spacing: 0;
+}
+
+.hero-invite {
+  margin: clamp(22px, 4vh, 34px) auto 0;
+  max-width: 19em;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-size: clamp(1.02rem, 4.2vw, 1.28rem);
+  line-height: 1.28;
+}
+
+/* Gold rules either side, the way the reference sets its date line. */
+.hero-dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  margin: clamp(24px, 4.2vh, 36px) 0 0;
+  color: var(--deep-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.6rem, 2.6vw, .7rem);
+  font-weight: 500;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+.hero-dates::before,
+.hero-dates::after {
+  content: "";
+  width: clamp(20px, 7vw, 34px);
+  height: 1px;
+  background: var(--gold-ink);
+}
+
+.hero-sparkle {
+  display: block;
+  margin-top: clamp(26px, 5vh, 44px);
+  color: var(--gold-ink);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: max(3.4dvh, 20px);
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateX(-50%) translateY(8px);
+  transition: opacity 900ms ease 1900ms, transform 900ms ease 1900ms;
+  pointer-events: none;
+}
+.scroll-cue::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -16px -30px;
+  background: radial-gradient(ellipse at center,
+    rgba(252,248,242,.8) 0%, rgba(252,248,242,.4) 48%, rgba(252,248,242,0) 78%);
+  filter: blur(9px);
+}
+.hero-screen.is-animated .scroll-cue { opacity: 1; transform: translateX(-50%); }
+.scroll-cue-label {
+  color: var(--olive-ink);
+  font-family: var(--font-sans);
+  font-size: .56rem;
+  font-weight: 500;
+  letter-spacing: .28em;
+  text-indent: .28em;
+  text-transform: uppercase;
+}
+.scroll-arrows { display: grid; justify-items: center; height: 26px; }
+.scroll-arrows i {
+  display: block;
+  width: 11px; height: 11px;
+  margin-top: -5px;
+  border-right: 2px solid var(--olive-ink);
+  border-bottom: 2px solid var(--olive-ink);
+  transform: rotate(45deg);
+  opacity: .34;
+  animation: scrollNudge 1900ms ease-in-out infinite;
+}
+.scroll-arrows i:nth-child(2) { animation-delay: .16s; opacity: .58; }
+.scroll-arrows i:nth-child(3) { animation-delay: .32s; opacity: .82; }
+@keyframes scrollNudge {
+  0%, 100% { transform: rotate(45deg) translate(0, 0); }
+  50%      { transform: rotate(45deg) translate(3px, 3px); }
+}
+/* ============================================================
+   SCRATCH TO REVEAL
+   The oval is cut by a canvas clip path rather than a CSS mask —
+   mask-image switches between alpha and luminance behaviour across
+   browsers, and the foil has to disappear exactly on the oval.
+   ============================================================ */
+.scratch-section {
+  position: relative;
+  width: 100%;
+  /* Content-height, NOT 100svh. The countdown sits directly under this
+     section and the two are meant to read as one panel — heading, bar,
+     couple, then the four boxes. Held to a screen, the scratch card
+     filled the viewport on its own and pushed the countdown onto the
+     next one. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(40px, 9vh, 64px) 24px clamp(10px, 2vh, 20px);
+  overflow: hidden;
+  /* Painted ground. It used to be a pink blossom garden, left over from the
+     watercolour palette the whole page once used; the card is warm paper,
+     deep olive and gold now, so the blooms are gold and olive too. Ends on
+     #f4ecdd, which is where .countdown-section picks up. */
+  background:
+    radial-gradient(ellipse 42% 30% at 8% 6%,   rgba(220,180,115,.30), transparent 70%),
+    radial-gradient(ellipse 38% 26% at 94% 10%, rgba(174,137,80,.24), transparent 70%),
+    radial-gradient(ellipse 46% 24% at 12% 94%, rgba(139,150,104,.26), transparent 72%),
+    radial-gradient(ellipse 50% 28% at 88% 97%, rgba(200,164,105,.28), transparent 72%),
+    radial-gradient(ellipse 60% 40% at 50% 48%, rgba(255,253,248,.88), transparent 76%),
+    linear-gradient(170deg, #faf5ec 0%, #f7f2ea 40%, #f4ecdd 100%);
+}
+.scratch-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .5;
+  /* scattered petals in the ground itself */
+  background-image:
+    radial-gradient(circle at 20% 22%, rgba(174,137,80,.38) 0 3px, transparent 4px),
+    radial-gradient(circle at 76% 34%, rgba(139,150,104,.32) 0 2px, transparent 3px),
+    radial-gradient(circle at 34% 72%, rgba(174,137,80,.30) 0 3px, transparent 4px),
+    radial-gradient(circle at 86% 68%, rgba(139,150,104,.28) 0 2px, transparent 3px);
+  background-size: 180px 200px, 150px 170px, 210px 230px, 130px 160px;
+}
+.scratch-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(253,246,236,.5) 0%, transparent 12%),
+    linear-gradient(0deg,   rgba(253,246,236,.45) 0%, transparent 9%);
+}
+
+.scratch-heading {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 clamp(18px, 4vh, 30px);
+  max-width: 16em;
+  color: var(--deep-ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.26rem, 5.4vw, 1.7rem);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 0 1px 12px rgba(253,246,236,.9);
+}
+
+.scratch-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* The bar. Its own height sets the box the canvas, the dates and the
+   prompt all stack inside — so the aspect lives here and nowhere else. */
+.scratch-bar {
+  position: relative;
+  width: min(84vw, 320px);
+  height: clamp(52px, 8.4vh, 64px);
+  border-radius: 999px;
+  box-shadow: 0 8px 22px -12px rgba(49,59,41,.45);
+}
+.scratch-bar.attention { animation: scrNudge 2.6s ease-in-out infinite; }
+@keyframes scrNudge {
+  0%, 88%, 100% { transform: translateX(0); }
+  92%           { transform: translateX(-3px); }
+  96%           { transform: translateX(3px); }
+}
+
+/* The couple, standing under the bar. */
+.scratch-couple {
+  position: relative;
+  z-index: 1;
+  width: min(58vw, 210px);
+  height: auto;
+  margin-top: clamp(26px, 5vh, 46px);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 14px 26px rgba(124,56,15,.18));
+  opacity: 0;
+  transform: translateY(14px);
+  animation: scrCoupleIn 1.1s cubic-bezier(.16,1,.3,1) .25s both;
+}
+@keyframes scrCoupleIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── the dates, waiting underneath ── */
+/* Fills the bar exactly: the dates sit behind the gilt and are uncovered
+   in place, so their box and the canvas's box have to be the same box. */
+.scratch-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* GRID, not flex, and the reason is `align-content`.
+     The two lines want a shared baseline — the month is a third the size
+     of the day and hanging it off the day's baseline is the only way it
+     reads as one line. But `align-items: baseline` in a FLEX box aligns
+     the items to each other and then leaves the whole line at the top of
+     the container: the date sat flush against the top of the bar with
+     40px of nothing under it. Flex's `align-content` cannot fix that —
+     it only does anything once the items wrap onto several lines.
+     Grid's does: it centres the single row, while `align-items: baseline`
+     still holds the two together. */
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  align-content: center;
+  align-items: baseline;
+  gap: .55em;
+  padding: 0 14px;
+  /* Both lines are centred here rather than left to the flex box: once a
+     long month stops shrinking to fit, `text-align: start` is what
+     actually places the line. */
+  text-align: center;
+  pointer-events: none;
+  border-radius: 999px;
+  background: linear-gradient(100deg,
+    rgba(253,246,236,.96) 0%, rgba(253,246,236,.86) 50%, rgba(253,246,236,.96) 100%);
+}
+.scratch-reveal::before {
+  content: "";
+  position: absolute;
+  inset: -8px -10px;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(192,138,62,.34) 0%, rgba(192,138,62,.16) 46%, rgba(192,138,62,0) 74%);
+}
+.scratch-reveal.show::before { animation: scrDateGlow 3.2s ease-in-out .25s infinite; }
+@keyframes scrDateGlow {
+  0%, 100% { opacity: .38; transform: scale(.9); }
+  50%      { opacity: .92; transform: scale(1.08); }
+}
+/* Set side by side now rather than stacked — the bar is short, and a
+   two-line reveal would not fit inside it. */
+.scratch-date-num {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 6.4vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--deep-ink);
+  opacity: 0;
+}
+.scratch-date-month {
+  position: relative;
+  /* Tracked caps carry a trailing gap after the last letter, and that gap is
+     inside the line box — so centring the box leaves the ink sitting half a
+     gap to the left. Pulling the same amount back off the right edge makes
+     the box end where the letters do.
+     (This used to be `padding-left`, which was right when the month was its
+     own centred line and wrong once it became half of a row.) */
+  margin: 0 -.15em 0 0;
+  font-family: var(--font-sans);
+  font-size: clamp(.56rem, 2.5vw, .66rem);
+  font-weight: 500;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--gold-ink);
+  opacity: 0;
+}
+.scratch-reveal.show .scratch-date-num   { animation: scrRevealNum   1s   .05s cubic-bezier(.16,1,.3,1) both; }
+.scratch-reveal.show .scratch-date-month { animation: scrRevealMonth .8s  .34s cubic-bezier(.16,1,.3,1) both; }
+@keyframes scrRevealNum {
+  0%   { opacity: 0; transform: scale(.6) translateY(14px);  filter: blur(12px); }
+  55%  { opacity: 1; transform: scale(1.08) translateY(-2px); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0);       filter: blur(0); }
+}
+@keyframes scrRevealMonth {
+  from { opacity: 0; transform: translateY(10px); letter-spacing: .05em; }
+  /* must land on the resting tracking, or the line jumps as the animation
+     hands back to the stylesheet */
+  to   { opacity: 1; transform: translateY(0);    letter-spacing: .15em; }
+}
+
+/* Canvas and glint fill the bar exactly — the gilt has to end on the
+   rounded edge, and the dates underneath share the same box. */
+.scratch-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%; height: 100%;
+  border-radius: 999px;
+  /* the scratch must never turn into a page scroll under the finger */
+  touch-action: none;
+  cursor: grab;
+  transition: opacity 700ms ease;
+}
+.scratch-canvas:active { cursor: grabbing; }
+.scratch-canvas.gone { opacity: 0; pointer-events: none; }
+
+.scratch-glint {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: 999px;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+.scratch-glint::before {
+  content: "";
+  position: absolute;
+  top: -40%; left: -60%;
+  width: 60%; height: 180%;
+  background: linear-gradient(105deg,
+    transparent 0%, rgba(255,252,245,0) 30%, rgba(255,252,245,.55) 50%,
+    rgba(255,252,245,0) 70%, transparent 100%);
+  transform: rotate(8deg);
+  animation: scrGlintSweep 2.8s ease-in-out infinite;
+}
+.scratch-glint.hidden { opacity: 0; }
+@keyframes scrGlintSweep { 0% { left: -60%; } 55%, 100% { left: 130%; } }
+
+/* the bar's own nudge lives with .scratch-bar above */
+@keyframes scrAttention {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.035); }
+}
+
+.scratch-hashtag {
+  margin: 0;
+  font-size: clamp(1.15rem, 5vw, 1.55rem);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-align: center;
+  color: var(--bougain-dp);
+  text-shadow: 0 1px 12px rgba(253,246,236,.85);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 1.1s ease, transform 1.1s ease;
+}
+.scratch-hashtag.visible { opacity: 1; transform: translateY(0); }
+
+/* grains while scratching, petals after — two canvases so the petals can
+   fade out while grains are still flying */
+.sand-canvas, .petal-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.sand-canvas  { z-index: 21; }
+.petal-canvas { z-index: 20; opacity: 0; transition: opacity 600ms ease; }
+.petal-canvas.active { opacity: 1; }
+
+
+/* ============================================================
+   SAVE THE DATES — the expanding cards
+
+   Each card carries its painting as a background and grows from its
+   place in the grid into a centred invitation. The growth is a FLIP
+   (see initEventCards): the layout change is instant and only the
+   inverse transform is animated, so nothing reflows mid-flight.
+   ============================================================ */
+.schedule {
+  position: relative;
+  z-index: 1;
+  padding: clamp(62px, 9vh, 96px) clamp(20px, 6vw, 34px) clamp(54px, 8vh, 84px);
+  text-align: center;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(174,137,80,.09), transparent 62%),
+    linear-gradient(180deg, var(--card-ground) 0%, #f3ece1 52%, var(--card-ground) 100%);
+}
+.sch-kicker {
+  margin: 0 0 12px;
+  color: var(--gold-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.56rem, 2.4vw, .64rem);
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-indent: .3em;
+  text-transform: uppercase;
+}
+.sch-title {
+  margin: 0 0 14px;
+  color: var(--deep-ink);
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 9vw, 3.4rem);
+  font-weight: 500;
+  line-height: .92;
+}
+.sch-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  width: min(74%, 240px);
+  margin: 0 auto clamp(26px, 4.5vh, 40px);
+  color: rgba(174,137,80,.75);
+}
+/* The hairline-diamond-hairline rule, shared by every section that uses
+   one. `.rsvp-rule-*` is in here because the RSVP heading uses those
+   class names: they were styled alongside the wardrobe, and deleting that
+   block took the shared definition with it. Without these the two spans
+   collapsed to
+   nothing and the diamond — the only thing left with any width — sat at
+   the flex-start edge of its 210px box, hard against the left. */
+.sch-rule-line,
+.rsvp-rule-line { flex: 1; height: 1px; background: currentColor; opacity: .5; }
+.sch-rule-diamond,
+.rsvp-rule-diamond { flex: none; font-size: .52rem; line-height: 1; }
+
+/* Both rules centre their own box, so the diamond lands on the middle. */
+.rsvp-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  width: min(100%, 240px);
+  margin: 0 auto .9rem;
+  color: rgba(192,138,62,.75);
+}
+
+.events-grid {
+  display: grid;
+  gap: 14px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* ── the card, closed ───────────────────────────────────────── */
+.event {
+  position: relative;
+  overflow: hidden;
+  min-height: 186px;
+  display: grid;
+  place-items: center;
+  padding: 26px 20px;
+  border: 1px solid rgba(174,137,80,.34);
+  border-radius: 3px;
+  background: #f6efe3;
+  box-shadow: 0 10px 26px -20px rgba(49,59,41,.6);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .8s ease var(--card-delay, 0ms),
+              transform .9s cubic-bezier(.16,1,.3,1) var(--card-delay, 0ms),
+              box-shadow .3s ease, border-color .3s ease;
+}
+.event.is-shown { opacity: 1; transform: translateY(0); }
+@media (hover: hover) {
+  .event:hover {
+    border-color: rgba(174,137,80,.7);
+    box-shadow: 0 16px 34px -20px rgba(49,59,41,.7);
+  }
+}
+.event:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 3px; }
+
+.event-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-position: center top;
+  background-size: cover;
+  opacity: .5;
+  transition: opacity .45s ease;
+}
+
+/* Some cards open onto a film rather than a painting. It runs ONLY while
+   the card is open: closed, the still art carries the grid and the video
+   is never fetched (preload="none" on the element), so a page of six cards
+   still costs one download, not six. The still doubles as the poster, so
+   the swap has nothing to flash through. */
+.event-film {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s ease;
+}
+.event.is-open .event-film { opacity: 1; }
+
+/* ── the SHUT card, for the cards that have a film ──────────
+   Its face is a frame cut from that film. At the standing .5 opacity under
+   the standing scrim it came back as a tint — grey for the night scenes —
+   which defeats the point of giving every card its own. So the picture is
+   allowed up, and the night ones get the same treatment the opened card
+   gives them: a dark veil with the type flipped to cream, because deep ink
+   on a night sky reads as nothing.
+   These stay below .event.is-open.has-film (three classes to two), so the
+   opened card's own rules still win. */
+.event.has-film .event-art { opacity: .92; }
+.event.has-film::before {
+  background: linear-gradient(180deg,
+    rgba(250,246,238,.82) 0%, rgba(250,246,238,.56) 48%, rgba(250,246,238,.82) 100%);
+}
+.event.has-film--night .event-art { opacity: 1; }
+.event.has-film--night::before {
+  background: linear-gradient(180deg,
+    rgba(12,16,28,.60) 0%, rgba(12,16,28,.42) 48%, rgba(12,16,28,.70) 100%);
+}
+.event.has-film--night .event-name { color: #fdf3e4; }
+.event.has-film--night .event-day  { color: rgba(253,243,228,.80); }
+.event.has-film--night .event-time { color: rgba(253,243,228,.92); }
+.event.has-film--night .event-note  { color: #e7c98f; }
+.event.has-film--night .event-alias { color: #e7c98f; text-shadow: none; }
+.event.has-film--night .event-open { color: rgba(231,201,143,.85); }
+/* One source carries its generator's mark in the bottom-right corner.
+   object-fit: cover maps the source's FULL height onto the element's
+   whenever the card is narrower than the frame — which is the usual case —
+   so the source's bottom edge is the element's bottom edge. Growing the
+   element past the card and letting the card's overflow:hidden clip it
+   therefore takes the mark with it, at any viewport. 106% hides the bottom
+   5.7% of the source; the mark starts 2.4% up from it, so there is better
+   than twice the margin needed. A wider card crops vertically instead and
+   has already lost that edge. */
+.event-film[data-crop="bottom"] { height: 106%; }
+.event.is-open.has-film .event-art { opacity: 0; }
+/* A scrim, so the type holds against whatever part of the painting the
+   crop happens to land on. */
+.event::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(250,246,238,.82), rgba(250,246,238,.62) 48%, rgba(250,246,238,.88));
+  transition: background .45s ease;
+}
+
+.event-summary { position: relative; z-index: 2; }
+/* The function's real name, under the couple's name for it. Pulled up
+   tight against the title so the two read as one unit. */
+.event-alias {
+  margin: -3px 0 9px;
+  color: #8a6a35;
+  text-shadow: 0 1px 7px rgba(252,248,240,.95), 0 0 2px rgba(252,248,240,.8);
+  font-family: var(--font-sans);
+  font-size: clamp(.52rem, 2.2vw, .58rem);
+  font-weight: 500;
+  letter-spacing: .22em;
+  text-indent: .22em;
+  text-transform: uppercase;
+}
+.pop-alias {
+  margin: -4px 0 13px;
+  color: var(--gold-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.54rem, 2.3vw, .6rem);
+  font-weight: 500;
+  letter-spacing: .24em;
+  text-indent: .24em;
+  text-transform: uppercase;
+}
+
+/* A function that runs to a timetable prints it: the part on the left in
+   the eyebrow face, its hour on the right in the reading face. */
+.pop-run {
+  display: grid;
+  gap: 7px;
+  width: min(100%, 17em);
+  margin: 0 auto 22px;
+  padding: 15px 0 0;
+  border-top: 1px solid rgba(174,137,80,.34);
+  list-style: none;
+}
+.pop-run li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pop-run-what {
+  color: var(--olive-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.52rem, 2.2vw, .58rem);
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.pop-run-when {
+  color: var(--deep-ink);
+  font-family: var(--font-display);
+  font-size: clamp(.95rem, 3.9vw, 1.06rem);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.event-name {
+  margin: 0 0 8px;
+  color: var(--deep-ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 7.6vw, 2.3rem);
+  font-weight: 500;
+  line-height: .9;
+}
+.event-day {
+  margin: 0;
+  color: var(--olive-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.6rem, 2.6vw, .68rem);
+  font-weight: 500;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.event-day sup { font-size: .66em; }
+.event-time {
+  margin: .4rem 0 0;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 4.2vw, 1.14rem);
+  font-style: italic;
+}
+.event-note {
+  margin: .3rem 0 0;
+  color: var(--gold-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.54rem, 2.3vw, .6rem);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.event-open {
+  margin: 1rem 0 0;
+  color: rgba(109,118,84,.85);
+  font-family: var(--font-sans);
+  font-size: clamp(.52rem, 2.2vw, .58rem);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+
+/* ── the card, opened ───────────────────────────────────────── */
+.event.is-open {
+  position: fixed;
+  left: 50%; top: 50%;
+  z-index: 60;
+  width: min(90vw, 430px);
+  height: auto;
+  max-height: min(88svh, 760px);
+  overflow-y: auto;
+  padding: 42px 28px 38px;
+  transform: translate(-50%, -50%);
+  cursor: default;
+  box-shadow: 0 30px 90px rgba(30,36,24,.42);
+  -webkit-overflow-scrolling: touch;
+}
+.event.is-open .event-art { opacity: .8; }
+/* Heavier than the closed card's scrim: the opened card carries five lines
+   of type over whatever part of the painting the crop lands on, and the
+   gold kicker was disappearing into the lit areas. */
+.event.is-open::before {
+  background: linear-gradient(180deg,
+    rgba(250,246,238,.86) 0%, rgba(250,246,238,.7) 46%, rgba(250,246,238,.9) 100%);
+}
+/* ── an opened card that has a film IS the film ─────────────
+   The standing treatment — a small panel with a scrim across the whole of
+   it — flattened the picture back into a tint, which is the one thing the
+   film was added to fix. A filmed card opens near full-screen instead and
+   the film is the card: no scrim, nothing cropped, the whole 1080x1920
+   frame playing edge to edge.
+
+   The wording then has to carry itself. The veil is moved OFF the card and
+   ON to the text block, as a gradient that fades out at its own bottom
+   edge — so it is exactly as tall as the words are, however many lines
+   they run to, and everything below them is clean picture. A fixed band
+   would either clip a long card's last line or dirty a short one's
+   artwork. These films are all composed the same way (open sky or wall at
+   the top, the couple at the foot), so the top is where the words go. */
+.event.is-open.has-film {
+  width: min(92vw, 440px);
+  height: min(92svh, 840px);
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+}
+.event.is-open.has-film::before { background: none; }
+.event.is-open.has-film .event-sparks { display: none; }
+
+.event.is-open.has-film .event-detail {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 2;
+  padding: clamp(20px, 4.2svh, 34px) clamp(18px, 6vw, 30px) clamp(38px, 9vh, 72px);
+  text-align: center;
+  background: linear-gradient(180deg,
+    rgba(252,248,240,.86) 0%, rgba(252,248,240,.68) 52%, rgba(252,248,240,0) 100%);
+}
+/* The longest card — kicker, name, alias, date, copy, a four-row timetable,
+   venue, then the map button — ran its button down on to the couple's
+   heads. The block is pulled up and every gap inside it shaved, which buys
+   about 60px: enough to clear the figures on the tallest card and simply
+   more picture on the short ones. Scoped to filmed cards, since it is the
+   film underneath that is being protected. */
+.event.is-open.has-film .pop-kicker { margin-bottom: 8px; }
+.event.is-open.has-film .pop-name   { margin-bottom: 8px; }
+.event.is-open.has-film .pop-alias  { margin-bottom: 10px; }
+.event.is-open.has-film .pop-when   { margin-bottom: 13px; }
+.event.is-open.has-film .pop-copy   { margin-bottom: 15px; }
+.event.is-open.has-film .pop-run {
+  gap: 6px;
+  padding-top: 12px;
+  margin-bottom: 15px;
+}
+.event.is-open.has-film .event-map-link { margin-top: 11px; }
+/* A night film needs the opposite: a dark veil, and the type flipped to
+   cream. Deep ink on a navy sky reads as nothing at all. */
+.event.is-open.has-film--night .event-detail {
+  background: linear-gradient(180deg,
+    rgba(10,14,26,.86) 0%, rgba(10,14,26,.66) 52%, rgba(10,14,26,0) 100%);
+}
+.event.is-open.has-film--night .pop-name,
+.event.is-open.has-film--night .pop-venue { color: #fdf3e4; }
+.event.is-open.has-film--night .pop-copy  { color: rgba(253,243,228,.92); }
+.event.is-open.has-film--night .pop-when  { color: rgba(253,243,228,.78); }
+.event.is-open.has-film--night .pop-kicker,
+.event.is-open.has-film--night .pop-alias,
+.event.is-open.has-film--night .pop-run-what { color: #e7c98f; }
+.event.is-open.has-film--night .pop-run-when { color: #fdf3e4; }
+.event.is-open.has-film--night .pop-run { border-top-color: rgba(231,201,143,.34); }
+.event.is-open.has-film--night .event-map-link {
+  border-color: rgba(231,201,143,.6);
+  color: #fdf3e4;
+}
+
+/* Guest colour code — an optional row under the venue on an opened card.
+   Dimmer label, the code itself in the same weight as the venue. */
+.pop-dress {
+  margin: .5rem 0 0;
+  font-size: clamp(.76rem, 3vw, .86rem);
+  line-height: 1.5;
+  letter-spacing: .02em;
+}
+.pop-dress-label {
+  display: block;
+  margin-bottom: .1rem;
+  font-family: var(--font-caps);
+  font-size: .58rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-indent: .2em;
+  text-transform: uppercase;
+  opacity: .72;
+}
+.event.is-open.has-film--night .event-close {
+  border-color: rgba(231,201,143,.45);
+  background: rgba(18,22,34,.72);
+  color: #fdf3e4;
+}
+.event.is-open .event-summary { display: none; }
+
+/* The dim behind an opened card.
+
+   It hangs off .schedule, NOT off body, because the card does too:
+   .schedule carries a z-index and is therefore its own stacking context,
+   so a backdrop painted at body level can never come between the section
+   and one of the section's own children — the card went under the dim.
+   Both live in the same context now, and the whole section is lifted
+   above its neighbours for as long as a card is open. */
+body.has-open-card .schedule { z-index: 60; }
+.schedule::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(30,36,24,.55);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .4s ease;
+}
+body.has-open-card .schedule::after { opacity: 1; pointer-events: auto; }
+body.has-open-card { overflow: hidden; }
+
+.event-detail { display: none; }
+.event.is-open .event-detail { display: block; position: relative; z-index: 2; }
+
+.pop-kicker {
+  margin: 0 0 10px;
+  color: var(--gold-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.54rem, 2.3vw, .6rem);
+  letter-spacing: .26em;
+  text-indent: .26em;
+  text-transform: uppercase;
+}
+.pop-name {
+  margin: 0 0 10px;
+  color: var(--deep-ink);
+  font-family: var(--font-name);
+  font-size: clamp(2.2rem, 9vw, 2.9rem);
+  font-weight: 400;
+  line-height: .95;
+}
+.pop-when {
+  margin: 0 0 18px;
+  color: var(--olive-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.58rem, 2.5vw, .66rem);
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.pop-when sup { font-size: .66em; }
+.pop-copy {
+  margin: 0 auto 22px;
+  max-width: 21em;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 4.1vw, 1.16rem);
+  line-height: 1.35;
+}
+.pop-venue {
+  margin: 0;
+  color: var(--deep-ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.02rem, 4.2vw, 1.2rem);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.event-map-link {
+  display: inline-flex;
+  margin-top: 16px;
+  padding: 9px 15px;
+  border: 1px solid rgba(174,137,80,.48);
+  border-radius: 999px;
+  color: var(--deep-ink);
+  font-family: var(--font-sans);
+  font-size: .58rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.event-close {
+  position: absolute;
+  top: 10px; right: 12px;
+  z-index: 3;
+  display: none;
+  width: 34px; height: 34px;
+  padding: 0;
+  border: 1px solid rgba(174,137,80,.4);
+  border-radius: 50%;
+  background: rgba(255,252,246,.8);
+  color: var(--deep-ink);
+  font: 300 22px/1 var(--font-display);
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.event.is-open .event-close { display: grid; place-items: center; }
+.event-close:active { transform: scale(.92); }
+@media (hover: hover) { .event-close:hover { background: #fff; } }
+
+/* ── per-card sparks, only while the card is open ───────────── */
+.event-sparks { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; }
+.event.is-open .event-sparks { opacity: 1; }
+.event-sparks i {
+  position: absolute;
+  top: var(--y, 40%);
+  left: var(--x, 50%);
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  opacity: 0;
+}
+.event-sparks i:nth-child(1) { --x: 14%; --y: 22%; animation-delay: .1s; }
+.event-sparks i:nth-child(2) { --x: 78%; --y: 16%; animation-delay: .9s; }
+.event-sparks i:nth-child(3) { --x: 32%; --y: 68%; animation-delay: 1.7s; }
+.event-sparks i:nth-child(4) { --x: 86%; --y: 58%; animation-delay: 2.4s; }
+.event-sparks i:nth-child(5) { --x: 54%; --y: 34%; animation-delay: 3.1s; }
+.event-sparks i:nth-child(6) { --x: 22%; --y: 46%; animation-delay: 3.8s; }
+
+.event--marigold .event-sparks i {
+  background: radial-gradient(circle, #f7c85a, rgba(247,200,90,0) 70%);
+  animation: sparkFloat 5.2s ease-in-out infinite;
+}
+.event--stars .event-sparks i {
+  background: radial-gradient(circle, #fffdf4, rgba(255,253,244,0) 70%);
+  box-shadow: 0 0 8px rgba(255,248,214,.9);
+  animation: sparkTwinkle 3.8s ease-in-out infinite;
+}
+.event--breeze .event-sparks i {
+  background: radial-gradient(circle, #e8c9a6, rgba(232,201,166,0) 70%);
+  animation: sparkDrift 6.4s linear infinite;
+}
+@keyframes sparkFloat {
+  0%   { opacity: 0; transform: translateY(8px) scale(.7); }
+  30%  { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-46px) scale(1.25); }
+}
+@keyframes sparkTwinkle {
+  0%, 100% { opacity: 0; transform: scale(.5); }
+  50%      { opacity: 1; transform: scale(1.3); }
+}
+@keyframes sparkDrift {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.8); }
+  25%  { opacity: .8; }
+  100% { opacity: 0; transform: translate(38px, -30px) scale(1.1); }
+}
+
+
+/* ============================================================
+   VENUE — where the celebration is
+   ============================================================ */
+.venue {
+  position: relative;
+  z-index: 1;
+  padding: clamp(58px, 8.5vh, 88px) clamp(20px, 6vw, 34px);
+  text-align: center;
+  background: linear-gradient(180deg, var(--card-ground) 0%, #f7f1e6 60%, var(--card-ground) 100%);
+}
+.venue-inner { max-width: 420px; margin: 0 auto; }
+.venue-kicker {
+  margin: 0 0 12px;
+  color: var(--gold-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.56rem, 2.4vw, .64rem);
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-indent: .3em;
+  text-transform: uppercase;
+}
+.venue-name {
+  margin: 0 0 12px;
+  color: var(--deep-ink);
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 8.4vw, 2.9rem);
+  font-weight: 500;
+  line-height: .95;
+}
+.venue-address {
+  margin: 0 auto clamp(22px, 4vh, 32px);
+  max-width: 22em;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-size: clamp(.96rem, 4vw, 1.1rem);
+  line-height: 1.45;
+}
+
+.venue-map {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(174,137,80,.38);
+  border-radius: 4px;
+  background: #efe9dd;
+  box-shadow: 0 14px 34px -22px rgba(49,59,41,.7);
+}
+.venue-map-frame {
+  display: block;
+  width: 100%;
+  height: clamp(240px, 38svh, 340px);
+  border: 0;
+  /* The embed ships a bright blue-and-white map; this pulls it back toward
+     the paper so it sits in the invitation rather than on top of it. */
+  filter: saturate(.72) contrast(.96) sepia(.14);
+}
+.venue-open {
+  position: absolute;
+  left: 50%;
+  /* Clear of Google's attribution strip along the foot of the embed —
+     their terms require it stay legible, so the button sits above it. */
+  bottom: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem 1.1rem;
+  transform: translateX(-50%);
+  border: 1px solid rgba(174,137,80,.5);
+  border-radius: 999px;
+  background: rgba(255,252,246,.94);
+  box-shadow: 0 6px 18px -10px rgba(49,59,41,.75);
+  color: var(--deep-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(.56rem, 2.4vw, .64rem);
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background .22s ease, transform .22s cubic-bezier(.16,1,.3,1);
+}
+.venue-open svg { width: 15px; height: 15px; color: var(--gold-ink); }
+.venue-open:active { transform: translateX(-50%) scale(.97); }
+@media (hover: hover) {
+  .venue-open:hover { background: #fff; transform: translateX(-50%) translateY(-2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-sparks { display: none; }
+  .hero-frame { transform: none !important; }
+}
+/* ============================================================
+   BLESSINGS
+   The lists are far too long to sit inside one 9:16 panel, so the
+   art is the FLOOR of the page rather than its background: the
+   names scroll over a warm sky the garden grows out of.
+
+   This page used to run its own palette — a lilac-to-blush ground with
+   teal side labels, plum block titles and rust names, four accents that
+   belonged to nothing else on the card. It is on the card's own colours
+   now: warm paper, deep olive ink, gold for every eyebrow and rule.
+   ============================================================ */
+.blessings { position: relative; width: 100%; }
+
+.bl-page {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  /* opens on --card-ground, which is exactly where .venue above it ends,
+     and settles into the warm sand the garden stands in */
+  background: linear-gradient(180deg, #f7f2ea 0%, #f8f1e2 16%, #f7efdf 46%, #f4ead7 100%);
+  /* room for the garden to stand in without the names landing in it —
+     percentage padding resolves against the WIDTH, so this tracks the
+     garden's own scale on every screen */
+  padding-bottom: 64%;
+}
+.bl-page::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 50%;
+  z-index: 3;
+  width: min(74%, 300px);
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(to right, transparent, rgba(174,137,80,.55), transparent);
+  pointer-events: none;
+}
+/* painted ground — the garden the page stands on. Its sky is dissolved into
+   the page's gradient, so there is no visible edge where the art starts. */
+.bl-art {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 62%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 30% 30% at 12% 88%, rgba(174,137,80,.34), transparent 72%),
+    radial-gradient(ellipse 26% 26% at 34% 96%, rgba(200,164,105,.30), transparent 72%),
+    radial-gradient(ellipse 32% 30% at 68% 92%, rgba(174,137,80,.30), transparent 72%),
+    radial-gradient(ellipse 28% 28% at 90% 86%, rgba(206,172,112,.28), transparent 72%),
+    radial-gradient(ellipse 40% 22% at 50% 100%, rgba(109,118,84,.42), transparent 74%),
+    linear-gradient(180deg, transparent 0%, rgba(240,232,210,.55) 46%, rgba(233,222,196,.78) 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 34%);
+          mask-image: linear-gradient(180deg, transparent 0%, #000 34%);
+}
+/* each page hands off to whatever follows it — page one to page two's sky,
+   page two to the RSVP's sand. A FIXED band, never a percentage: a page here
+   is ~1600px tall, so even 14% would drain the colour out of the whole
+   garden instead of just seaming it to what comes next. */
+.bl-page::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  height: clamp(70px, 16vw, 120px);
+  pointer-events: none;
+  background: linear-gradient(0deg, var(--bl-handoff) 0%, transparent 100%);
+}
+.bl-page--groom { --bl-handoff: #f3ecf6; }
+.bl-page--bride { --bl-handoff: #f6e7d2; }
+
+.bl-inner {
+  position: relative;
+  z-index: 2;
+  width: min(90vw, 400px);
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 88px) 0 clamp(20px, 4vh, 40px);
+  text-align: center;
+}
+.bl-heading {
+  margin: 0 0 .6rem;
+  font-family: var(--font-caps);
+  font-size: clamp(1.55rem, 6vw, 2rem);
+  font-weight: 400;
+  letter-spacing: .34em;
+  text-indent: .34em;
+  color: var(--deep-ink);
+}
+.bl-note {
+  margin: 0 0 clamp(26px, 4.5vh, 44px);
+  color: var(--olive-ink);
+  font-size: clamp(.9rem, 3.7vw, 1.02rem);
+  font-style: italic;
+  line-height: 1.5;
+}
+.bl-side {
+  margin: 0 0 clamp(16px, 2.6vh, 26px);
+  color: var(--gold-ink);
+  font-family: var(--font-caps);
+  font-size: clamp(.68rem, 2.9vw, .78rem);
+  font-weight: 600;
+  letter-spacing: .26em;
+  text-indent: .26em;
+  text-transform: uppercase;
+}
+/* page two carries no note under its masthead, so the side label needs the
+   air the note would have given it */
+.bl-heading + .bl-side { margin-top: clamp(22px, 3.6vh, 36px); }
+
+.bl-block { margin: 0 0 clamp(24px, 4vh, 38px); }
+.bl-block-title {
+  position: relative;
+  margin: 0 0 .62rem;
+  padding-bottom: .42rem;
+  color: var(--olive-ink);
+  font-size: clamp(.74rem, 3.05vw, .86rem);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: .19em;
+  text-indent: .19em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+/* a short rule draws itself out from the centre under each heading */
+.bl-block-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 50%;
+  width: 0; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(174,137,80,.48), transparent);
+  transform: translateX(-50%);
+  transition: width 900ms cubic-bezier(.16,1,.3,1) var(--bl-delay, 0ms);
+}
+.bl-page.is-visible .bl-block.is-shown .bl-block-title::after { width: 62px; }
+
+.bl-names { margin: 0; }
+.bl-names span {
+  display: block;
+  color: var(--deep-ink);
+  font-size: clamp(.94rem, 3.85vw, 1.06rem);
+  font-weight: 600;
+  letter-spacing: .042em;
+  line-height: 1.66;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 720ms ease var(--bl-name-delay, 0ms),
+    transform 820ms cubic-bezier(.16,1,.3,1) var(--bl-name-delay, 0ms);
+}
+.bl-block.is-shown .bl-names span { opacity: 1; transform: translateY(0); }
+
+.bl-rule, .bl-heading, .bl-note, .bl-side {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 850ms ease var(--bl-delay, 0ms),
+    transform 950ms cubic-bezier(.16,1,.3,1) var(--bl-delay, 0ms);
+}
+.bl-page.is-visible .bl-rule,
+.bl-page.is-visible .bl-heading,
+.bl-page.is-visible .bl-note,
+.bl-page.is-visible .bl-side { opacity: 1; transform: translateY(0); }
+
+.bl-block-title {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 800ms ease var(--bl-delay, 0ms),
+    transform 900ms cubic-bezier(.16,1,.3,1) var(--bl-delay, 0ms);
+}
+.bl-block.is-shown .bl-block-title { opacity: 1; transform: translateY(0); }
+
+
+/* ============================================================
+   RSVP
+   ============================================================ */
+.rsvp {
+  position: relative;
+  width: 100%;
+  padding: clamp(58px, 9vh, 90px) 30px clamp(52px, 8vh, 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 40%, rgba(192,138,62,.10) 0%, transparent 62%),
+    linear-gradient(180deg, #f6e7d2 0%, #fdf6ec 22%, #fdf6ec 70%, #f6e7d2 100%);
+}
+.rsvp::before, .rsvp::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: min(72%, 260px);
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(to right, transparent, rgba(192,138,62,.30), transparent);
+  pointer-events: none;
+}
+.rsvp::before { top: 0; }
+.rsvp::after  { bottom: 0; }
+
+.rsvp-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 390px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.rsvp-heading {
+  margin: 0 0 .55rem;
+  font-family: var(--font-caps);
+  font-size: clamp(1.8rem, 6.8vw, 2.3rem);
+  font-weight: 400;
+  letter-spacing: .42em;
+  text-indent: .42em;
+  color: var(--terra-deep);
+}
+.rsvp-sub-rule {
+  width: 28px;
+  height: 1px;
+  margin-bottom: 1.1rem;
+  background: linear-gradient(to right, transparent, rgba(192,138,62,.6), transparent);
+}
+.rsvp-note {
+  margin: 0 0 1.9rem;
+  max-width: 300px;
+  color: var(--ink-soft);
+  font-size: clamp(.9rem, 3.7vw, 1.02rem);
+  font-style: italic;
+  line-height: 1.5;
+}
+#rsvpLists { width: 100%; }
+.rsvp-side {
+  width: 100%;
+  margin: 0 0 .5rem;
+  color: var(--peacock);
+  font-family: var(--font-caps);
+  font-size: clamp(.68rem, 2.9vw, .78rem);
+  font-weight: 600;
+  letter-spacing: .26em;
+  text-indent: .26em;
+  text-transform: uppercase;
+  text-align: left;
+}
+.rsvp-contacts + .rsvp-side { margin-top: 1.9rem; }
+.rsvp-contacts { list-style: none; padding: 0; margin: 0; width: 100%; }
+.rsvp-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .82rem 0;
+  border-top: 1px solid rgba(192,138,62,.22);
+}
+.rsvp-contacts .rsvp-row:last-child { border-bottom: 1px solid rgba(192,138,62,.22); }
+.rsvp-identity { flex: 1; text-align: left; display: flex; flex-direction: column; gap: .18rem; }
+.rsvp-name {
+  font-size: clamp(.94rem, 3.9vw, 1.06rem);
+  font-weight: 600;
+  color: var(--ink);
+}
+.rsvp-num {
+  font-family: var(--font-caps);
+  font-size: clamp(.74rem, 3vw, .82rem);
+  letter-spacing: .16em;
+  color: var(--ink-soft);
+}
+.rsvp-actions { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; }
+.rsvp-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: background .22s ease, border-color .22s ease, transform .22s cubic-bezier(.16,1,.3,1);
+}
+.rsvp-action svg { width: 15px; height: 15px; flex-shrink: 0; }
+.rsvp-action--phone {
+  background: rgba(192,138,62,.13);
+  border: 1px solid rgba(192,138,62,.32);
+  color: var(--terra);
+}
+.rsvp-action--wa {
+  background: rgba(31,111,107,.11);
+  border: 1px solid rgba(31,111,107,.30);
+  color: var(--peacock);
+}
+.rsvp-action:active { transform: scale(.91); }
+@media (hover: hover) {
+  .rsvp-action--phone:hover { background: rgba(192,138,62,.26); border-color: rgba(192,138,62,.55); transform: translateY(-1px); }
+  .rsvp-action--wa:hover    { background: rgba(31,111,107,.22);  border-color: rgba(31,111,107,.52);  transform: translateY(-1px); }
+}
+
+.rsvp-rule, .rsvp-heading, .rsvp-sub-rule, .rsvp-note, .rsvp-side, .rsvp-row {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity .85s ease var(--rsvp-delay, 0ms),
+    transform .95s cubic-bezier(.16,1,.3,1) var(--rsvp-delay, 0ms);
+}
+.rsvp.is-visible .rsvp-rule,
+.rsvp.is-visible .rsvp-heading,
+.rsvp.is-visible .rsvp-sub-rule,
+.rsvp.is-visible .rsvp-note,
+.rsvp.is-visible .rsvp-side,
+.rsvp.is-visible .rsvp-row { opacity: 1; transform: translateY(0); }
+
+
+/* ============================================================
+   COUNTDOWN
+
+   Four small bordered boxes, not the full-height panel of cartouches
+   it used to be. It sits between the scratch card and the cards now,
+   so it has to read as one more thing on that page rather than as a
+   screen of its own — which means no heading, no particles, and a
+   ground that carries the scratch section's cream straight into the
+   cards below.
+   ============================================================ */
+.countdown-section {
+  --cd-rose: #c2547c;
+  --cd-gold: #d9a441;
+  --cd-soft: #a06c46;
+
+  position: relative;
+  width: 100%;
+  padding: clamp(22px, 4vh, 36px) clamp(18px, 6vw, 34px) clamp(36px, 6vh, 58px);
+  background: linear-gradient(180deg, #f4ecdd 0%, #f8f2e6 42%, var(--card-ground) 100%);
+}
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(7px, 2.4vw, 12px);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.cd-box {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  padding: clamp(10px, 2.6vw, 15px) 2px;
+  border: 1px solid var(--cd-gold);
+  border-radius: 7px;
+  background: rgba(255,253,249,.92);
+  box-shadow: 0 4px 14px -10px rgba(124,56,15,.5);
+}
+.cd-num {
+  color: var(--cd-rose);
+  font-family: var(--font-display);
+  /* tabular figures, or the boxes jitter every time a digit changes */
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.22rem, 6vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1;
+}
+.cd-label {
+  color: var(--cd-soft);
+  font-family: var(--font-display);
+  font-size: clamp(.6rem, 2.5vw, .72rem);
+  line-height: 1;
+}
+
+.countdown-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity .8s ease var(--countdown-delay, 0ms),
+    transform .9s cubic-bezier(.16,1,.3,1) var(--countdown-delay, 0ms);
+}
+/* The footer is in this list because it carries .countdown-reveal spans
+   but is no longer inside .countdown-section — the countdown moved up
+   under the scratch card and left it behind. */
+.countdown-section.is-visible .countdown-reveal,
+.wedding-footer.is-visible .countdown-reveal { opacity: 1; transform: translateY(0); }
+
+
+/* ============================================================
+   FOOTER — the dark floral close
+
+   The same floral ground as the hero, taken right down: the hero opens
+   the invitation on it in daylight and this closes on it at night, so
+   the page ends where it began. Only the overlay differs.
+   ============================================================ */
+.wedding-footer {
+  --foot-ink:   var(--deep-ink);
+  --foot-muted: var(--olive-ink);
+  --foot-gold:  var(--gold-ink);
+
+  position: relative;
+  width: 100%;
+  padding: clamp(64px, 11vh, 110px) clamp(22px, 7vw, 40px) clamp(56px, 9vh, 92px);
+  overflow: hidden;
+  text-align: center;
+  /* The floral untreated, exactly as the hero wears it — the invitation
+     opens on this artwork and closes on it, same daylight both ends.
+     The only thing over it is the hero's own veil: a soft cream lift
+     through the middle so the type holds, and a seam at the top so the
+     panel above runs into it rather than butting against it. Nothing
+     here darkens the image. */
+  background:
+    radial-gradient(ellipse 78% 52% at 50% 48%,
+      rgba(252,248,242,.86) 0%, rgba(252,248,242,.46) 56%, rgba(252,248,242,0) 80%),
+    linear-gradient(to bottom, var(--card-ground) 0%, transparent 22%),
+    url("assets/hero/floral_frame.webp") center / cover no-repeat;
+  color: var(--foot-muted);
+}
+.footer-inner { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; }
+
+.footer-flourish {
+  display: block;
+  margin-bottom: clamp(20px, 4vh, 34px);
+  color: var(--foot-gold);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  line-height: 1;
+}
+
+.wedding-footer p { margin: 0; }
+
+.footer-names {
+  margin: 0;
+  color: var(--foot-ink);
+  font-family: var(--font-name);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 12vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -.03em;
+}
+
+.footer-line {
+  margin-top: clamp(24px, 4.5vh, 40px) !important;
+  color: var(--foot-muted);
+  font-family: var(--font-sans);
+  font-size: clamp(.58rem, 2.6vw, .7rem);
+  font-weight: 500;
+  letter-spacing: .26em;
+  text-indent: .26em;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+
+.footer-hashtag {
+  margin-top: clamp(30px, 5.5vh, 52px) !important;
+  color: var(--foot-gold);
+  font-family: var(--font-sans);
+  font-size: clamp(.6rem, 2.7vw, .72rem);
+  font-weight: 500;
+  letter-spacing: .22em;
+  text-indent: .22em;
+  text-transform: uppercase;
+}
+/* ============================================================
+   MUSIC TOGGLE
+   The score is played on the bow: while it sounds the bow is drawn
+   back and forth, and muted it lifts clear and the disc dims.
+   ============================================================ */
+.music-btn {
+  position: fixed;
+  right: clamp(10px, 3.4vw, 24px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(10px, 3.4vw, 24px));
+  z-index: 60;
+  /* a shade larger than a plain icon would need: the kamaicha carries
+     strings, a bridge and tassels, and needs the room to read */
+  width: clamp(66px, 17.5vw, 86px);
+  height: clamp(66px, 17.5vw, 86px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  /* held back until the hero brings it in, so it is never seen over the
+     opening card — see showMusicControl() */
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+.music-btn.is-ready { opacity: 1; }
+.music-btn[hidden] { display: none; }
+/* The instrument is cut out with real alpha, so it needs no plate behind it —
+   it sits straight on the page, lifted off by its own shadow. Sized by
+   HEIGHT: the artwork is taller than it is wide, and sizing by width would
+   run the neck off the top of the control. */
+.mb-kamaicha {
+  position: absolute;
+  left: 50%; top: 50%;
+  height: 116%;
+  width: auto;
+  transform: translate(-50%, -50%);
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 5px 12px rgba(124, 56, 15, .34));
+  transition: filter 500ms ease, opacity 500ms ease;
+}
+/* The bow's own axis runs at -47.7° (measured off its trimmed box) and the
+   kamaicha's neck at about -61°, so +78° lays the bow across the strings at
+   very close to a right angle — which is what reads as bowing.
+   translateX AFTER the rotate travels along the bow's own length, so the
+   stroke is a true bow stroke rather than a slide across the screen. */
+.mb-bow {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 104%;
+  transform: translate(-50%, -50%) rotate(78deg);
+  transform-origin: 50% 50%;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 2px 5px rgba(124, 56, 15, .32));
+  transition: transform 700ms cubic-bezier(.16, 1, .3, 1);
+}
+/* playing — the bow is drawn back and forth across the strings */
+.music-btn:not(.is-muted) .mb-bow { animation: mbBow 2.8s ease-in-out infinite; }
+@keyframes mbBow {
+  0%, 100% { transform: translate(-50%, -50%) rotate(78deg) translateX(-8%); }
+  50%      { transform: translate(-50%, -50%) rotate(78deg) translateX(8%); }
+}
+/* muted — the bow lifts clear of the strings and the kamaicha dims.
+   translateY after the rotate lifts perpendicular to the bow, off the
+   strings, rather than straight up the screen. */
+.music-btn.is-muted .mb-bow { transform: translate(-50%, -50%) rotate(78deg) translateY(-22%) translateX(-6%); }
+.music-btn.is-muted .mb-kamaicha { filter: grayscale(.45) brightness(1.04) drop-shadow(0 4px 9px rgba(124, 56, 15, .22)); opacity: .8; }
+
+
+/* ============================================================
+   DESKTOP FRAME
+   The invitation is written for a phone; on a wide screen it is
+   held in a column of that width rather than stretched across.
+   ============================================================ */
+#device-frame { width: 100%; }
+
+@media (min-width: 600px) {
+  html, body { background: #2a1b12; }
+
+  #device-frame {
+    width: 480px;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+  }
+  /* fixed overlays re-centre onto the column */
+  .intro-screen, .ivory-dissolve {
+    left: 50%;
+    right: auto;
+    width: 480px;
+    margin-left: -240px;
+  }
+  /* the floating control sits inside the column's right edge, keeping the
+     same inset the phone layout uses */
+  .music-btn { right: calc(50vw - 240px + clamp(10px, 3.4vw, 24px)); }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   Every reveal above is written so the end state is the resting
+   state, so nothing is lost by skipping the journey.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hero-content, .scroll-cue, .scratch-couple { opacity: 1 !important; filter: none !important; transform: none !important; }
+  .scroll-cue { transform: translateX(-50%) !important; }
+  .countdown-particles, .event-sparks { display: none; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   THE GROOM'S CARD IS PINK
+
+   His gate is a blush envelope and the card behind it was the same warm
+   paper as the bride's, so the film handed over into a different room.
+   Every ground is restated here in the envelope's own colour — #ecb4b4,
+   sampled off the film and lightened to something a page can carry.
+
+   ONLY the grounds move. The ink, the gold, every rule and every type
+   size stay exactly as they are on the bride's card, so this is a change
+   of paper rather than a second design to keep in step. The attribute is
+   on <html>, so one selector reaches the whole document.
+   ══════════════════════════════════════════════════════════════════ */
+html[data-invite-side="groom"] { --card-ground: #f9e6e8; }
+
+/* The hero's floral is a cream and sage painting, so a pink page under it
+   still read as cream — it covers nearly the whole screen. A pink laid
+   over it in multiply tints the artwork itself rather than hiding it, so
+   the florals keep their drawing and take the blush. */
+[data-invite-side="groom"] .hero-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #f0bfc4;
+  mix-blend-mode: multiply;
+  opacity: .5;
+  pointer-events: none;
+}
+[data-invite-side="groom"] .hero-veil {
+  background:
+    radial-gradient(ellipse 74% 48% at 50% 44%,
+      rgba(253,243,244,.82) 0%, rgba(253,243,244,.42) 55%, rgba(253,243,244,0) 78%),
+    linear-gradient(to bottom, transparent 72%, var(--card-ground) 100%);
+}
+
+/* the gate, and the veil it hands over through */
+[data-invite-side="groom"] .intro-screen { background: #eec9c9; }
+[data-invite-side="groom"] .intro-paper {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 38%, rgba(255,248,249,.95), transparent 70%),
+    radial-gradient(circle at 18% 16%, rgba(224,122,158,.14), transparent 42%),
+    radial-gradient(circle at 84% 78%, rgba(192,138,62,.10), transparent 46%),
+    linear-gradient(170deg, #fbe9ea 0%, #f3d4d6 52%, #eac3c4 100%);
+}
+[data-invite-side="groom"] .ivory-dissolve {
+  background: radial-gradient(circle at 50% 44%, #fff8f8 0%, #fbe9ea 36%, #f3d4d6 66%, #e9bfc1 100%);
+}
+
+/* the scratch panel and the countdown under it read as one, so they seam
+   on #f4d9dc the way their cream originals seam on #f4ecdd */
+[data-invite-side="groom"] .scratch-section {
+  background:
+    radial-gradient(ellipse 42% 30% at 8% 6%,   rgba(226,138,150,.30), transparent 70%),
+    radial-gradient(ellipse 38% 26% at 94% 10%, rgba(208,112,126,.24), transparent 70%),
+    radial-gradient(ellipse 46% 24% at 12% 94%, rgba(218,130,144,.26), transparent 72%),
+    radial-gradient(ellipse 50% 28% at 88% 97%, rgba(228,148,160,.28), transparent 72%),
+    radial-gradient(ellipse 60% 40% at 50% 48%, rgba(255,250,250,.86), transparent 76%),
+    linear-gradient(170deg, #fdf1f2 0%, #f9e6e8 40%, #f4d9dc 100%);
+}
+[data-invite-side="groom"] .scratch-section::before {
+  background-image:
+    radial-gradient(circle at 20% 22%, rgba(208,112,126,.34) 0 3px, transparent 4px),
+    radial-gradient(circle at 76% 34%, rgba(218,130,144,.28) 0 2px, transparent 3px),
+    radial-gradient(circle at 34% 72%, rgba(208,112,126,.26) 0 3px, transparent 4px),
+    radial-gradient(circle at 86% 68%, rgba(218,130,144,.24) 0 2px, transparent 3px);
+}
+[data-invite-side="groom"] .countdown-section {
+  background: linear-gradient(180deg, #f4d9dc 0%, #f8e9ea 42%, var(--card-ground) 100%);
+}
+
+/* the schedule, and the shut cards standing on it */
+[data-invite-side="groom"] .schedule {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(208,112,126,.10), transparent 62%),
+    linear-gradient(180deg, var(--card-ground) 0%, #f6dce0 52%, var(--card-ground) 100%);
+}
+[data-invite-side="groom"] .event { background: #f7dfe1; }
+
+/* blessings, and the RSVP it hands off to */
+[data-invite-side="groom"] .bl-page {
+  background: linear-gradient(180deg, #f9e6e8 0%, #f7dfe2 16%, #f5d8db 46%, #f2d0d4 100%);
+}
+[data-invite-side="groom"] .bl-page--groom { --bl-handoff: #f2d0d4; }
+[data-invite-side="groom"] .bl-art {
+  background:
+    radial-gradient(ellipse 30% 30% at 12% 88%, rgba(208,112,126,.32), transparent 72%),
+    radial-gradient(ellipse 26% 26% at 34% 96%, rgba(220,134,148,.28), transparent 72%),
+    radial-gradient(ellipse 32% 30% at 68% 92%, rgba(208,112,126,.28), transparent 72%),
+    radial-gradient(ellipse 28% 28% at 90% 86%, rgba(224,144,158,.26), transparent 72%),
+    radial-gradient(ellipse 40% 22% at 50% 100%, rgba(170,92,104,.34), transparent 74%),
+    linear-gradient(180deg, transparent 0%, rgba(244,214,218,.55) 46%, rgba(238,198,204,.78) 100%);
+}
+[data-invite-side="groom"] .rsvp {
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 40%, rgba(208,112,126,.10) 0%, transparent 62%),
+    linear-gradient(180deg, #f2d0d4 0%, #fdf2f3 22%, #fdf2f3 70%, #f2d0d4 100%);
+}
