@@ -34,7 +34,6 @@ outright rather than left in place. A wrong picture is worse than no picture.
 | `assets/og/og.jpg` | 1200×630 | The **share card** — the picture WhatsApp, iMessage and Instagram show when someone sends the link | The old one said *"Radhika & Raghav · Hotel Damson Plum, Lucknow · 20–21 November 2026"*. **It was live.** There is now no `og:image` at all, so a shared link shows the title and one line of text, and no picture. Add the file, then put the `og:image`, `og:image:width`, `og:image:height` and `twitter:image` tags back in both `bride.html` and `groom.html` — the comment in the head says exactly how, and the paths must be absolute. |
 | `favicon.png` | 32×32 | The little icon in a browser tab | The old one was their **RR monogram**. There is none now, so browsers show their default and ask for `/favicon.ico` once per page (a harmless 404 in the console). Add the file and restore the `<link rel="icon">` — again, the comment in the head marks the spot. |
 | `apple-touch-icon.png` | 180×180 | The icon if someone saves the card to their phone's home screen | Same monogram, same story. |
-| `assets/scratch/couple.webp` | transparent PNG or WebP, ~450px wide | An **illustration of the couple** that stood under the scratch bar | The old one was drawn for them. The section closes up neatly without it, so nothing looks broken. Drop a file in and restore the `<img class="scratch-couple">` in both cards — `.scratch-couple` in `style.css` still styles it. |
 | *(optional)* an image for the gold ring | square, ~300px | A painting instead of the ॐ in the hero's gold ring | The old card had a Shrinathji pichwai there, which was **that family's choice**. Both cards now show ॐ, which is what your own announcement site uses. If you want a painting instead, put it in `assets/hero/` and set `markImage:` on that side in `script.js` — the ring opens out into a framed panel for it. |
 
 ---
@@ -52,6 +51,7 @@ be entirely your own.
 | `assets/cards/haldi-mehendi-still.jpg`<br>`assets/cards/sangeet-still.jpg`<br>`assets/cards/wedding-still.jpg` | The face of each shut function card | Generic scenes — a bougainvillea arch, a ballroom, a garden. Each is a frame cut from the film below it, so a replacement has to be cut from the matching film or both change together. |
 | `assets/video/haldi-mehendi-bg.mp4`<br>`assets/video/sangeet-bg.mp4`<br>`assets/video/wedding-bg.mp4` | The film behind each card once it is opened | Same three scenes, moving. |
 | `assets/music/ishq-hai.mp3` | The background score | **This is the song the other family chose.** It starts at 0:38 (`MUSIC_START` in `script.js`), which is tuned to this track — a different song needs that number changed or removed. Delete the file and the music button hides itself; nothing else breaks. |
+| `assets/scratch/couple.webp` | The illustration of the couple under the scratch bar | The previous card's drawing, kept by choice. It is faceless and carries no names. Replace the file to change it. |
 | `assets/music/kamaicha.png`, `bow.png` | The artwork on the music button | Supplied to the previous project. |
 
 `assets/video/gate.mp4` and `assets/hero/gate_poster.jpg` are **yours** — the

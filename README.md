@@ -76,7 +76,7 @@ The short version:
 | The year | assumed **2026**, which makes the Wedding a Tuesday — confirm |
 | Amaraa Farms postal address | only "Arjunganj, Lucknow" is on record; the map pin is exact |
 | Grandparents, and the groom's father | only the parents' names were supplied |
-| `assets/og/og.jpg`, `favicon.png`, `apple-touch-icon.png`, `assets/scratch/couple.webp` | deleted — each carried the previous couple's name or monogram. Nothing points at them; the head comments say how to put each back. |
+| `assets/og/og.jpg`, `favicon.png`, `apple-touch-icon.png` | deleted — each carried the previous couple's name or monogram. Nothing points at them; the head comments say how to put each back. |
 
 Everything outstanding is also marked `MISSING` in a comment in `script.js`.
 

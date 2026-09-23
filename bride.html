@@ -182,10 +182,9 @@
         <div class="scratch-glint" id="scratchGlint" aria-hidden="true"></div>
       </div>
 
-      <!-- An illustration of the couple stood here. It was the previous
-           card's, so it is gone. Put a transparent PNG or WebP at
-           assets/scratch/couple.webp and restore the <img> — .scratch-couple
-           still styles it. -->
+      <img class="scratch-couple" src="assets/scratch/couple.webp" alt=""
+           draggable="false" loading="lazy" decoding="async"
+           onerror="this.style.display='none'" />
 
       <p class="scratch-hashtag" id="scratchHashtag" data-hashtag></p>
     </div>

@@ -52,7 +52,6 @@ for (const [what, src] of everything) {
 for (const f of ['assets/og/og.jpg',            // "Radhika & Raghav", RR monogram
                  'favicon.png',                 // RR monogram
                  'apple-touch-icon.png',        // RR monogram
-                 'assets/scratch/couple.webp',  // their illustrated couple
                  'assets/hero/nathji.jpg']) {   // the pichwai their side chose
   assert.ok(!has(f), f + ' is the previous card’s and must stay deleted');
 }
@@ -60,8 +59,10 @@ for (const [name, page] of pages) {
   const markup = page.replace(/<!--[\s\S]*?-->/g, '');   // the comments name them on purpose
   assert.doesNotMatch(markup, /og:image|twitter:image/,
                       name + ' must not point a share card at a missing or borrowed image');
-  assert.doesNotMatch(markup, /favicon\.png|apple-touch-icon\.png|couple\.webp|nathji/,
+  assert.doesNotMatch(markup, /favicon\.png|apple-touch-icon\.png|nathji/,
                       name + ' must not reach for deleted artwork');
+  assert.match(markup, /<img class="scratch-couple" src="assets\/scratch\/couple\.webp"/,
+               name + ' shows the couple under the scratch bar');
   assert.match(markup, /<meta name="twitter:card" content="summary"/,
                name + ' drops to the no-image card while there is no og:image');
 }
