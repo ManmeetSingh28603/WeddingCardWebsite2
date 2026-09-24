@@ -14,12 +14,9 @@ Everything the invitation *says* lives in the `CONFIG` object at the top of
 
 | What | Where it goes | What happens meanwhile |
 | --- | --- | --- |
-| **RSVP phone numbers**, bride's side and groom's side | `CONFIG.rsvp.bride` / `.groom` in `script.js` | **The whole RSVP section removes itself from both cards.** A heading and "please call" with nothing under them is worse than no section, so it hides until a number exists. Add one row and it comes back on its own. |
 | **The year** | `CONFIG.dates.year` and `CONFIG.dates.moment.y` | Assumed **2026** — see §4. |
-| **Full postal address of Amaraa Farms** | `CONFIG.venue.address` and `AMARAA.address` | The venue line reads just "Arjunganj, Lucknow". The map pin itself is exact, taken from your Google Maps link. |
 
-Each of these is marked `MISSING` in a comment in `script.js`, so they are
-findable without this file.
+The RSVP numbers and the venue address have arrived and are on the card.
 
 ---
 
@@ -66,7 +63,6 @@ film you sent. Everything else in `assets/` is listed above.
 | **The year is 2026** | Your announcement says only "23rd / 24th November". 2026 is the next one. It makes **Haldi and Sangeet a Monday** and the **Wedding a Tuesday** — worth a second look, since that is unusual. | `CONFIG.dates` — the year, the footer string, and `moment.y` |
 | **Both sides are invited to all three functions** | Nothing said otherwise. The two cards differ only in whose name comes first, whose family line shows, and whose compliments are listed. | `SIDE_CONFIGS[…].events` |
 | **The countdown aims at the wedding**, 24 Nov 7:00 pm | It was aimed at the wedding on the old card too. | `CONFIG.dates.moment` |
-| **The wedding has no dress code** | Haldi and Sangeet have one on your announcement; the wedding does not. | add `dress:` to the wedding event |
 | **The three functions' descriptions** | Taken word for word from your announcement site. | `copy:` on each event |
 
 ---
@@ -95,15 +91,18 @@ the ॐ.
 What you gave me, in place and correct:
 
 - **Bride's side** — Mr Prem Sagar Pal (father), Mrs Neetu Pal (mother). With Best Compliments: Prem Sagar Pal, Neetu Pal, Garima Pal.
-- **Groom's side** — Gayatri Srivastava (mother). With Best Compliments: Gayatri Srivastava, Utkarsha Sahay.
+- **Groom's side** — Mrs Gayatri Srivastava (mother), Mr Vijay Kumar Sahay (father). With Best Compliments: Gayatri Srivastava, Utkarsha Sahay.
+- **Grandparents** — bride: Late Kanhaiyalal Pal & Late Sakhiya Devi (Baba, Dadi), Shtrughan Pal & Vidyavati Pal (Nana, Nani). Groom: Late Surendra Prasad & Late Sushila Prasad, Late Badrinath Sahay & Late Saraswati Sahay.
+- **RSVP** — bride's side Prem Sagar Pal, groom's side Gayatri Srivastava. Each card lists only its own side.
+- **Venue** — Amaraa Farms and Resort, Arjunganj, Lucknow, Uttar Pradesh 226002.
+- **Spellings** of the compliments lists confirmed.
 - Haldi 23rd, 11:00 am · Sangeet 23rd, 7:00 pm · Wedding 24th, 7:00 pm, all at Amaraa Farms, Arjunganj, Lucknow.
-- Dress codes: Yellow & Orange (Haldi), Dark Blue / Black & Red / Maroon (Sangeet).
+- **No guest colour codes** on any function — the family asked for them to be removed.
 - **"Confirm Your Presence" is gone** — the form, its backend, its styling and both builders' tick boxes.
 
-Only the parents' names were supplied, so the hero lines read `D/O Smt. Neetu
-Pal & Shri Prem Sagar Pal` and `S/O Smt. Gayatri Srivastava`. Send
-grandparents' names, or the groom's father's, and they go in at
-`CONFIG.lineage`.
+The hero prints grandparents, then parents, under each name — see
+`CONFIG.lineage`. "Shtrughan" is spelled as supplied; the usual spelling is
+"Shatrughan", so it is worth one confirmation.
 
 ---
 
@@ -111,8 +110,9 @@ grandparents' names, or the groom's father's, and they go in at
 
 **It is public.** Anyone with the address can read it, and GitHub Pages cannot
 password-protect a static file. That is fine for an invitation, but it is why
-no phone numbers, no guest list and no ID documents live here — and why they
-should not be added.
+nothing lives here beyond what a paper card would print: the two RSVP numbers
+are on the card on purpose, but no guest list and no ID documents — and none
+should be added.
 
 `node tests/invitation-pages.test.js` checks all of the above that can be
 checked: that the previous couple's names, wording and artwork have not crept

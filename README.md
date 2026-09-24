@@ -61,7 +61,8 @@ Conventions worth knowing:
   together. The "Find your way to us" map is pinned by lat/lng, so a link
   whose name disagrees with the pin sends guests to the wrong place.
 - `dress` on an event is optional and prints a **Guest colour code** row under
-  the venue on the opened card. Leave it off and nothing renders.
+  the venue on the opened card. Leave it off and nothing renders. The family
+  asked for no colour codes, so no function sets it.
 
 ## Still missing
 
@@ -72,10 +73,7 @@ The short version:
 
 | | |
 | --- | --- |
-| RSVP contact numbers | none supplied for either side, so the RSVP section removes itself from both cards |
 | The year | assumed **2026**, which makes the Wedding a Tuesday — confirm |
-| Amaraa Farms postal address | only "Arjunganj, Lucknow" is on record; the map pin is exact |
-| Grandparents, and the groom's father | only the parents' names were supplied |
 | `assets/og/og.jpg`, `favicon.png`, `apple-touch-icon.png` | deleted — each carried the previous couple's name or monogram. Nothing points at them; the head comments say how to put each back. |
 
 Everything outstanding is also marked `MISSING` in a comment in `script.js`.

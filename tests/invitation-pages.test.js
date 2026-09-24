@@ -75,8 +75,8 @@ for (const [what, src] of everything) {
                       'copy from the cloned card must not linger in ' + what);
 }
 
-/* ── a postcode nobody supplied is a postcode nobody can trust ── */
-assert.doesNotMatch(script, /226002/, 'the venue postcode was inferred, not given');
+/* ── the postal address, as the family wrote it ── */
+assert.match(script, /address: 'Amaraa Farms and Resort, Arjunganj, Lucknow, Uttar Pradesh 226002'/);
 
 /* ── Confirm Your Presence is GONE, not merely switched off: the form, its
       styling, its glyphs, its link parameter and its builder tick box ── */
@@ -95,8 +95,8 @@ assert.ok(!has('apps-script'), 'the form backend must be gone with the form');
 /* ── an RSVP with nobody to call takes itself off the page ── */
 assert.match(script, /document\.getElementById\('rsvp'\)\?\.remove\(\);/,
              'an empty contact list must remove the section, not print an empty heading');
-assert.match(script, /rsvp: \{\s*bride: \[\],\s*groom: \[\],\s*\}/,
-             'no numbers were supplied for either side');
+assert.match(script, /tel: '918318526297'/, 'the bride’s side has a number to call');
+assert.match(script, /tel: '917275251099'/, 'the groom’s side has a number to call');
 
 /* ── one gate film, on both cards, cropped as the portrait it is ── */
 for (const [name, page] of pages) {
@@ -174,13 +174,11 @@ for (const m of script.matchAll(/id: '([a-z]+)'[\s\S]*?film: '([^']+)'/g)) films
 const used = Object.values(films);
 assert.equal(new Set(used).size, used.length, 'two cards share a film: ' + used.join(', '));
 
-/* ── the guest colour code: optional, and only where one was given ── */
+/* ── the guest colour code: optional, and the family asked for none ── */
 assert.match(script, /const dress = ev\.dress/);
 assert.match(script, /pop-dress-label">Guest colour code/);
 assert.match(css, /\.pop-dress \{/, 'the colour code row needs its own rule');
-assert.match(script, /dress: 'Yellow &amp; Orange'/);
-assert.doesNotMatch(script, /id: 'wedding'[\s\S]{0,400}dress:/,
-                    'no colour code was given for the wedding');
+assert.doesNotMatch(script, /^\s*dress: '/m, 'no function carries a colour code');
 
 /* ── one venue, one pin, on BOTH cards — the two-venue split is over ── */
 assert.match(script, /lat: 26\.7993442, lng: 80\.9897956/, 'Amaraa Farms needs its pin');
@@ -195,7 +193,9 @@ assert.match(script, /SIDE === 'groom' \? 'Groom\u2019s Side' : 'Bride\u2019s Si
 
 /* ── lineage, and the descender fix that stops a tail colliding ── */
 assert.match(script, /D\/O Smt\. Neetu Pal &amp; Shri Prem Sagar Pal/);
-assert.match(script, /S\/O Smt\. Gayatri Srivastava/);
+assert.match(script, /S\/O Smt\. Gayatri Srivastava &amp; Shri Vijay Kumar Sahay/);
+assert.match(script, /'Granddaughter of',\s*'Late Shri Kanhaiyalal Pal/);
+assert.match(script, /'Grandson of',\s*'Late Shri Surendra Prasad/);
 assert.match(css, /\.hero-names \{[^}]*--font-script/s, 'the names are set in the script face');
 assert.doesNotMatch(css, /\.hero-names \{[^}]*line-height: \.82/s, 'the clipping line-height must not come back');
 

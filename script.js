@@ -79,11 +79,8 @@ let CONFIG = {
   venue: {
     kicker:  'Find your way to us',
     name:    'Amaraa Farms',
-    /* Reverse-geocoded from the Maps link below, NOT supplied by the
-       family — worth having them confirm it before the cards go out. */
-    /* MISSING — the full postal address. This is only what the couple's
-       own announcement says; the pin below is exact, the wording is not. */
-    address: 'Arjunganj, Lucknow',
+    /* The postal address as the family wrote it. */
+    address: 'Amaraa Farms and Resort, Arjunganj, Lucknow, Uttar Pradesh 226002',
     mapUrl:  'https://maps.app.goo.gl/FvnkfV8fd2BBWL3q8',
     /* Google's keyless embed form. Coordinates come from the link above,
        so the pin lands on the farm itself rather than on a name search. */
@@ -112,7 +109,8 @@ let CONFIG = {
        at     when the countdown aims at this function; noon if absent
        art    the painting behind the card
        theme  which particle treatment plays: marigold | stars | breeze
-       dress  optional guest colour code, printed under the venue
+       dress  optional guest colour code, printed under the venue.
+              The family asked for none, so no function sets it.
 
      Every card that has a film takes its closed face from that film — a
      single frame cut out of it (assets/cards/*-still.jpg) — so the shut
@@ -126,7 +124,6 @@ let CONFIG = {
       time: '11:00 am onwards',
       at: { h: 11, min: 0 },
       copy: 'Join us for a sunshine-soaked Haldi carnival filled with music, colour, games, food and endless laughter.',
-      dress: 'Yellow &amp; Orange',
       art: 'assets/cards/haldi-mehendi-still.jpg', theme: 'marigold',
       /* Light scene, so the wording stays dark. filmCrop drops the bottom
          of the frame, where this source carries its generator's mark. */
@@ -138,7 +135,6 @@ let CONFIG = {
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
       copy: 'An evening of dance, music, laughter, food and fun — come ready to celebrate under the stars.',
-      dress: 'Dark Blue / Black &amp; Red / Maroon',
       /* The ballroom — a dancing floor under chandeliers. A night scene, so
          the wording flips to cream. */
       art: 'assets/cards/sangeet-still.jpg', theme: 'stars',
@@ -182,15 +178,16 @@ let CONFIG = {
   },
 
   /* `tel` is the full international form behind the call and WhatsApp
-     links; `shown` is what is printed on the page.
-
-     MISSING — no contact numbers were supplied for either side. While a
-     side's list is empty the whole RSVP section takes itself off that card
-     rather than printing a heading with nothing under it. Add a row here
-     and the section comes back on its own. */
+     links; `shown` is what is printed on the page. Each card lists only
+     its own side. An empty list takes the whole RSVP section off that card
+     rather than printing a heading with nothing under it. */
   rsvp: {
-    bride: [],
-    groom: [],
+    bride: [
+      { name: 'Prem Sagar Pal', tel: '918318526297', shown: '+91 83185 26297' },
+    ],
+    groom: [
+      { name: 'Gayatri Srivastava', tel: '917275251099', shown: '+91 72752 51099' },
+    ],
   },
 };
 
@@ -201,7 +198,7 @@ const SIDE = document.documentElement.dataset.inviteSide === 'groom' ? 'groom' :
    link whose name and address disagree with the pin sends guests astray. */
 const AMARAA = {
   name: 'Amaraa Farms',
-  address: 'Arjunganj, Lucknow',
+  address: 'Amaraa Farms and Resort, Arjunganj, Lucknow, Uttar Pradesh 226002',
   mapUrl: 'https://maps.app.goo.gl/FvnkfV8fd2BBWL3q8',
   lat: 26.7993442, lng: 80.9897956,
 };
@@ -233,13 +230,21 @@ const SIDE_CONFIGS = {
   },
 };
 
+/* Grandparents first, then parents — the order the family sent them in.
+   Paternal grandparents lead on the bride's side (Baba, Dadi, then Nana,
+   Nani); the groom's are in the order given. */
 CONFIG.lineage = {
   bride: [
+    'Granddaughter of',
+    'Late Shri Kanhaiyalal Pal &amp; Late Smt. Sakhiya Devi',
+    '&amp; Shri Shtrughan Pal &amp; Smt. Vidyavati Pal',
     'D/O Smt. Neetu Pal &amp; Shri Prem Sagar Pal',
   ],
-  /* only the mother's name was supplied for the groom */
   groom: [
-    'S/O Smt. Gayatri Srivastava',
+    'Grandson of',
+    'Late Shri Surendra Prasad &amp; Late Smt. Sushila Prasad',
+    '&amp; Late Shri Badrinath Sahay &amp; Late Smt. Saraswati Sahay',
+    'S/O Smt. Gayatri Srivastava &amp; Shri Vijay Kumar Sahay',
   ],
 };
 Object.assign(CONFIG.venue, SIDE_CONFIGS[SIDE].venue);
