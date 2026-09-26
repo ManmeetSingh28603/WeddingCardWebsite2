@@ -74,7 +74,7 @@ The short version:
 | | |
 | --- | --- |
 | The year | assumed **2026**, which makes the Wedding a Tuesday — confirm |
-| `assets/og/og.jpg`, `favicon.png`, `apple-touch-icon.png` | deleted — each carried the previous couple's name or monogram. Nothing points at them; the head comments say how to put each back. |
+| `favicon.png`, `apple-touch-icon.png` | deleted — each carried the previous couple's name or monogram. Nothing points at them; the head comments say how to put each back. |
 
 Everything outstanding is also marked `MISSING` in a comment in `script.js`.
 

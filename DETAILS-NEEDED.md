@@ -17,6 +17,8 @@ Everything the invitation *says* lives in the `CONFIG` object at the top of
 | **The year** | `CONFIG.dates.year` and `CONFIG.dates.moment.y` | Assumed **2026** — see §4. |
 
 The RSVP numbers and the venue address have arrived and are on the card.
+The share card (`assets/og/og.jpg`) is the family's own monogram artwork,
+centred on 1200×630 from the `og.jpeg` they sent.
 
 ---
 
@@ -28,7 +30,6 @@ outright rather than left in place. A wrong picture is worse than no picture.
 
 | File to supply | Size | What it is | What is happening right now |
 | --- | --- | --- | --- |
-| `assets/og/og.jpg` | 1200×630 | The **share card** — the picture WhatsApp, iMessage and Instagram show when someone sends the link | The old one said *"Radhika & Raghav · Hotel Damson Plum, Lucknow · 20–21 November 2026"*. **It was live.** There is now no `og:image` at all, so a shared link shows the title and one line of text, and no picture. Add the file, then put the `og:image`, `og:image:width`, `og:image:height` and `twitter:image` tags back in both `bride.html` and `groom.html` — the comment in the head says exactly how, and the paths must be absolute. |
 | `favicon.png` | 32×32 | The little icon in a browser tab | The old one was their **RR monogram**. There is none now, so browsers show their default and ask for `/favicon.ico` once per page (a harmless 404 in the console). Add the file and restore the `<link rel="icon">` — again, the comment in the head marks the spot. |
 | `apple-touch-icon.png` | 180×180 | The icon if someone saves the card to their phone's home screen | Same monogram, same story. |
 | *(optional)* an image for the gold ring | square, ~300px | A painting instead of the ॐ in the hero's gold ring | The old card had a Shrinathji pichwai there, which was **that family's choice**. Both cards now show ॐ, which is what your own announcement site uses. If you want a painting instead, put it in `assets/hero/` and set `markImage:` on that side in `script.js` — the ring opens out into a framed panel for it. |

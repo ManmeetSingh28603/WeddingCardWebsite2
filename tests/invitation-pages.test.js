@@ -49,23 +49,26 @@ for (const [what, src] of everything) {
       monogram or their family's choice; a wrong picture on a share card or
       a browser tab is worse than none, so each is DELETED rather than
       swapped for a placeholder, and the markup must not reach for it. ── */
-for (const f of ['assets/og/og.jpg',            // "Radhika & Raghav", RR monogram
-                 'favicon.png',                 // RR monogram
+for (const f of ['favicon.png',                 // RR monogram
                  'apple-touch-icon.png',        // RR monogram
                  'assets/hero/nathji.jpg']) {   // the pichwai their side chose
   assert.ok(!has(f), f + ' is the previous card’s and must stay deleted');
 }
 for (const [name, page] of pages) {
   const markup = page.replace(/<!--[\s\S]*?-->/g, '');   // the comments name them on purpose
-  assert.doesNotMatch(markup, /og:image|twitter:image/,
-                      name + ' must not point a share card at a missing or borrowed image');
+  /* The share card is the couple's own monogram now, and a scraper only
+     follows an absolute URL. */
+  const IMG = 'content="https://manmeetsingh28603.github.io/WeddingCardWebsite2/assets/og/og.jpg"';
+  assert.ok(markup.includes('<meta property="og:image" ' + IMG), name + ' needs an absolute og:image');
+  assert.ok(markup.includes('<meta name="twitter:image" ' + IMG), name + ' needs an absolute twitter:image');
   assert.doesNotMatch(markup, /favicon\.png|apple-touch-icon\.png|nathji/,
                       name + ' must not reach for deleted artwork');
   assert.match(markup, /<img class="scratch-couple" src="assets\/scratch\/couple\.webp"/,
                name + ' shows the couple under the scratch bar');
-  assert.match(markup, /<meta name="twitter:card" content="summary"/,
-               name + ' drops to the no-image card while there is no og:image');
+  assert.match(markup, /<meta name="twitter:card" content="summary_large_image"/,
+               name + ' shows the share picture large');
 }
+assert.ok(has('assets/og/og.jpg'), 'the share card image must ship');
 assert.doesNotMatch(script, /markImage: '/, 'no side may name artwork that does not ship');
 
 /* ── and no wording lifted from that card ── */
