@@ -181,9 +181,17 @@ for (const theme of ['marigold', 'stars', 'breeze']) {
 }
 assert.match(css, /\.event::before \{[^}]*radial-gradient[^}]*var\(--scrim\)/s);
 assert.match(css, /\.event\.is-open::before \{ opacity: 0; \}/);
-/* "Tap to unfold" pinned absolute inside the summary landed on the date */
-assert.doesNotMatch(css, /\.event-open \{[^}]*position: absolute/s,
-                    'Tap to unfold must stay in the flow under the date');
+/* "Tap to unfold" is pinned to the card's foot, so it must sit OUTSIDE the
+   summary: inside it, the pin resolved against the summary and landed on
+   the date. Outside, the name and date centre in the card on their own. */
+assert.match(script, /<\/div>\s*<p class="event-open">Tap to unfold<\/p>/,
+             'Tap to unfold must be a direct child of the card, after the summary');
+
+/* ── no map button on the cards: the Venue section carries the map ── */
+assert.doesNotMatch(script + css, /event-map-link|Show location on map/);
+
+/* ── the groom's side lists Ayush as well as his mother ── */
+assert.match(script, /\{ name: 'Ayush Sahay',\s*tel: '918123764986', shown: '\+91 81237 64986' \}/);
 
 /* ── the guest colour code: optional, and the family asked for none ── */
 assert.match(script, /const dress = ev\.dress/);

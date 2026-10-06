@@ -191,6 +191,7 @@ let CONFIG = {
     ],
     groom: [
       { name: 'Gayatri Srivastava', tel: '917275251099', shown: '+91 72752 51099' },
+      { name: 'Ayush Sahay',        tel: '918123764986', shown: '+91 81237 64986' },
     ],
   },
 
@@ -216,7 +217,8 @@ const AMARAA = {
 };
 /* Every function is looked up here rather than derived from a side, so a
    function that moves later only has to be named in this table. `city` is
-   simply the second line, and an empty mapUrl prints no link at all. */
+   simply the second line. The cards print no map link of their own: the
+   Venue section below them carries the map. */
 const V_AMARAA = { name: AMARAA.name, city: 'Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl };
 const EVENT_VENUES = {
   haldi:   V_AMARAA,
@@ -556,8 +558,8 @@ function renderEventCards() {
          <p class="event-day">${when}</p>
          <p class="event-time">${ev.time}</p>
          ${note}
-         <p class="event-open">Tap to unfold</p>
        </div>
+       <p class="event-open">Tap to unfold</p>
        <button class="event-close" type="button" aria-label="Close ${stripTags(ev.title)} invitation">&times;</button>
        <div class="event-detail">
          <p class="pop-kicker">We invite you to our</p>
@@ -568,7 +570,6 @@ function renderEventCards() {
          ${sched}
          <p class="pop-venue">${ev.venue.name}${ev.venue.city ? `<br />${ev.venue.city}` : ''}</p>
          ${dress}
-         ${ev.venue.mapUrl ? `<a class="event-map-link" href="${ev.venue.mapUrl}" target="_blank" rel="noopener noreferrer">Show location on map</a>` : ''}
        </div>`;
 
     /* The painting is set as a style rather than in the markup so a missing

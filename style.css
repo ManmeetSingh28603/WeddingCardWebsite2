@@ -822,11 +822,15 @@ html, body {
 .event-day sup { font-size: .66em; }
 /* the reference's shut card is the name and the date, nothing more */
 .event-time, .event-note { display: none; }
-/* In the flow under the date, not pinned to the card's foot: pinned, it
-   was placed against the summary block rather than the card and landed on
-   the date; and a two-line teaser leaves no room at the foot anyway. */
+/* Pinned to the card's foot, OUTSIDE .event-summary, so the name and date
+   centre in the card on their own. It must stay a direct child of .event:
+   inside the summary, bottom: 15px resolved against the summary block and
+   landed on the date. */
 .event-open {
-  margin: 14px 0 0;
+  position: absolute;
+  right: 12px; bottom: 15px; left: 12px;
+  z-index: 3;
+  margin: 0;
   color: var(--day);
   font-family: var(--font-sans);
   font-size: 8px;
@@ -962,19 +966,6 @@ html, body {
   text-transform: uppercase;
 }
 .pop-dress-label { display: block; }
-.event-map-link {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 7px 13px;
-  border: 1px solid var(--pop-rule);
-  color: var(--pop-venue);
-  font-family: var(--font-sans);
-  font-size: 8px;
-  font-weight: 500;
-  letter-spacing: .16em;
-  text-decoration: none;
-  text-transform: uppercase;
-}
 .event-close {
   position: absolute;
   top: 15px; right: 15px;
@@ -1171,10 +1162,10 @@ body.has-open-card { overflow: hidden; }
   /* opens on --card-ground, which is exactly where .venue above it ends,
      and settles into the warm sand the garden stands in */
   background: linear-gradient(180deg, #f7f2ea 0%, #f8f1e2 16%, #f7efdf 46%, #f4ead7 100%);
-  /* room for the garden to stand in without the names landing in it —
-     percentage padding resolves against the WIDTH, so this tracks the
-     garden's own scale on every screen */
-  padding-bottom: 64%;
+  /* Sized to the lists, not to a garden: each side has only two or three
+     names, and the old 64% foot left half a screen of empty floral under
+     them. Just enough for the floral to frame the names from below. */
+  padding-bottom: clamp(54px, 16%, 90px);
 }
 .bl-page::before {
   content: "";
@@ -1192,14 +1183,14 @@ body.has-open-card { overflow: hidden; }
 .bl-art {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  height: 62%;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
-  background: url("assets/hero/floral-frame.jpg") center bottom / cover no-repeat;
-  opacity: .35;
+  background: url("assets/hero/floral-frame.jpg") center / cover no-repeat;
+  opacity: .32;
   mix-blend-mode: multiply;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%);
-          mask-image: linear-gradient(180deg, transparent 0%, #000 45%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 30%);
+          mask-image: linear-gradient(180deg, transparent 0%, #000 30%);
 }
 /* each page hands off to whatever follows it — page one to page two's sky,
    page two to the RSVP's sand. A FIXED band, never a percentage: a page here
@@ -1221,7 +1212,7 @@ body.has-open-card { overflow: hidden; }
   z-index: 2;
   width: min(90vw, 400px);
   margin: 0 auto;
-  padding: clamp(56px, 9vh, 88px) 0 clamp(20px, 4vh, 40px);
+  padding: clamp(60px, 9vh, 84px) 0 0;
   text-align: center;
 }
 .bl-heading {
@@ -1243,10 +1234,10 @@ body.has-open-card { overflow: hidden; }
 .bl-block { margin: 0 0 clamp(24px, 4vh, 38px); }
 .bl-block-title {
   position: relative;
-  margin: 0 0 .62rem;
-  padding-bottom: .42rem;
+  margin: 0 0 1rem;
+  padding-bottom: .55rem;
   color: var(--olive-ink);
-  font-size: clamp(.74rem, 3.05vw, .86rem);
+  font-size: clamp(.8rem, 3.3vw, .9rem);
   font-style: italic;
   font-weight: 600;
   letter-spacing: .19em;
@@ -1270,10 +1261,10 @@ body.has-open-card { overflow: hidden; }
 .bl-names span {
   display: block;
   color: var(--deep-ink);
-  font-size: clamp(.94rem, 3.85vw, 1.06rem);
-  font-weight: 600;
-  letter-spacing: .042em;
-  line-height: 1.66;
+  font-size: clamp(1.32rem, 5.6vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: .01em;
+  line-height: 1.55;
   opacity: 0;
   transform: translateY(10px);
   transition:
