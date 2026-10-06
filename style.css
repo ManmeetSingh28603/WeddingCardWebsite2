@@ -777,13 +777,16 @@ html, body {
 .event.is-open .event-film { opacity: 1; }
 
 .event-summary { position: relative; z-index: 3; width: 100%; padding: 14px; }
+/* The shut card carries the function's teaser name ("The Yellow Affair");
+   the opened card gives its plain name. Longer than "Haldi", so a little
+   smaller, and allowed two lines. */
 .event-name {
   margin: 0;
   color: var(--title);
   font-family: var(--font-display);
-  font-size: 47px;
+  font-size: clamp(34px, 10vw, 42px);
   font-weight: 500;
-  line-height: .85;
+  line-height: .95;
   text-shadow: 0 2px 12px var(--title-glow);
 }
 .event-day {
@@ -799,11 +802,11 @@ html, body {
 .event-day sup { font-size: .66em; }
 /* the reference's shut card is the name and the date, nothing more */
 .event-time, .event-note { display: none; }
+/* In the flow under the date, not pinned to the card's foot: pinned, it
+   was placed against the summary block rather than the card and landed on
+   the date; and a two-line teaser leaves no room at the foot anyway. */
 .event-open {
-  position: absolute;
-  right: 12px; bottom: 15px; left: 12px;
-  z-index: 3;
-  margin: 0;
+  margin: 14px 0 0;
   color: var(--day);
   font-family: var(--font-sans);
   font-size: 8px;

@@ -156,7 +156,9 @@ couple's painting; Sangeet and Wedding show a still from their film when shut
 and play the film once opened (`preload="none"`, so the grid never pulls a
 video on load). Each card has one of three colourways (`event--marigold`,
 `--stars`, `--breeze`) whose inks are taken card by card from the reference.
-Shut, a card shows the name, the date and "Tap to unfold". Tapping it grows it
+Shut, a card shows its **teaser name** — The Yellow Affair, The Wedding
+Jukebox, The Forever Affair (`teaser` in `CONFIG.events`) — the date and "Tap
+to unfold"; opened, it gives the plain name: Haldi, Sangeet, Wedding. Tapping it grows it
 to a near full-height card with a FLIP — the card jumps to its opened
 geometry, both boxes are measured, and only the inverse transform is animated
 (1.1s, as the reference does it). The wording fades in once it has nearly

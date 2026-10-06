@@ -168,6 +168,16 @@ for (const theme of ['marigold', 'stars', 'breeze']) {
 }
 assert.match(script, /Tap to unfold/);
 
+/* ── shut, a card wears its teaser name; opened, its plain name ── */
+assert.match(script, /id: 'haldi', title: 'Haldi', teaser: 'The Yellow Affair'/);
+assert.match(script, /id: 'sangeet', title: 'Sangeet', teaser: 'The Wedding Jukebox'/);
+assert.match(script, /id: 'wedding', title: 'Wedding', teaser: 'The Forever Affair'/);
+assert.match(script, /class="event-name">\$\{ev\.teaser \|\| ev\.title\}/);
+assert.match(script, /class="pop-name">\$\{ev\.title\}/);
+/* "Tap to unfold" pinned absolute inside the summary landed on the date */
+assert.doesNotMatch(css, /\.event-open \{[^}]*position: absolute/s,
+                    'Tap to unfold must stay in the flow under the date');
+
 /* ── the guest colour code: optional, and the family asked for none ── */
 assert.match(script, /const dress = ev\.dress/);
 assert.match(script, /pop-dress-label">Guest colour code/);

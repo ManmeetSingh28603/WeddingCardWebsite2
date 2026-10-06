@@ -107,6 +107,8 @@ let CONFIG = {
      functions they are invited to by their own link, and the cards read
      the same for everyone.
 
+       title  the function's plain name, shown once its card is opened
+       teaser the name on the shut card; falls back to title if absent
        at     when the countdown aims at this function; noon if absent
        art    the painting behind the card
        theme  which particle treatment plays, and which of the three
@@ -125,7 +127,7 @@ let CONFIG = {
      in its sky. */
   events: [
     {
-      id: 'haldi', title: 'Haldi',
+      id: 'haldi', title: 'Haldi', teaser: 'The Yellow Affair',
       day: '23', suffix: 'rd', weekday: 'Monday', month: 'November',
       time: '11:00 am onwards',
       at: { h: 11, min: 0 },
@@ -133,7 +135,7 @@ let CONFIG = {
       art: 'assets/cards/haldi-card.jpg', theme: 'marigold',
     },
     {
-      id: 'sangeet', title: 'Sangeet',
+      id: 'sangeet', title: 'Sangeet', teaser: 'The Wedding Jukebox',
       day: '23', suffix: 'rd', weekday: 'Monday', month: 'November',
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
@@ -144,7 +146,7 @@ let CONFIG = {
       film: 'assets/video/sangeet-bg.mp4',
     },
     {
-      id: 'wedding', title: 'Wedding',
+      id: 'wedding', title: 'Wedding', teaser: 'The Forever Affair',
       day: '24', suffix: 'th', weekday: 'Tuesday', month: 'November',
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
@@ -549,7 +551,7 @@ function renderEventCards() {
        ${film}
        <div class="event-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
        <div class="event-summary">
-         <h3 class="event-name">${ev.title}</h3>
+         <h3 class="event-name">${ev.teaser || ev.title}</h3>
          ${alias}
          <p class="event-day">${when}</p>
          <p class="event-time">${ev.time}</p>
