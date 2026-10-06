@@ -12,6 +12,7 @@ groom-invite-builder.html  groom-side guest-link builder
 style.css                  all styling and animation
 script.js                  CONFIG at the top, then behaviour
 assets/                    everything the site actually loads
+rsvp-sheet/Code.gs         the Google Apps Script that receives RSVP replies
 tests/                     node:assert checks over the markup and config
 ```
 
@@ -49,14 +50,11 @@ Conventions worth knowing:
 - An **empty string** removes a line rather than printing a blank. A gap where
   a line should be reads as a fault; a shorter card does not.
 - A contact with an empty `tel` renders **without** call and WhatsApp buttons,
-  since a `tel:+` link with no number leads nowhere. **An empty contact list
-  takes the whole RSVP section off the page** — a heading and "we are only a
-  call away" with nothing under them is worse than silence. Put a row in
-  `CONFIG.rsvp` and the section comes back on its own.
+  since a `tel:+` link with no number leads nowhere. An empty contact list
+  drops the list and its "please call" line; the reply form stays.
+- **Nothing says "Bride's Side" or "Groom's Side"** — not the RSVP, not the
+  Blessings. Each card carries only its own family's contact and list.
 - `CONFIG.lineage` prints under each name in the hero, the invited side first.
-  It is set in Pinyon Script above them, so `.hero-names` needs a line-height
-  over 1 and the padding under `.hero-name`, or a descender runs into the
-  `D/O` line beneath it.
 - **One venue, `AMARAA` in `script.js`** — name, address *and* coordinates
   together. The "Find your way to us" map is pinned by lat/lng, so a link
   whose name disagrees with the pin sends guests to the wrong place.
@@ -83,9 +81,9 @@ Everything outstanding is also marked `MISSING` in a comment in `script.js`.
 This started as the invitation for a different couple. Their names, venue,
 dates, wording and artwork have all been taken out, and
 `tests/invitation-pages.test.js` fails if any of it creeps back. What remains
-of theirs is decorative and carries nobody's name — the floral ground, the
-three function films and the score — and is listed in `DETAILS-NEEDED.md` §3
-so it can be replaced deliberately rather than forgotten.
+of theirs now is the score and the music-button artwork, listed in
+`DETAILS-NEEDED.md` §3. Every picture on the card is the couple's own, from
+their announcement site.
 
 ## One invitation, many links
 
@@ -120,19 +118,46 @@ Three things follow from that:
 - **`?b=0` drops the Blessings section**, outright rather than emptied.
   Blessings show by default, so only a link that says otherwise hides them.
 
+## The design
+
+**Copied from the couple's own announcement site,
+`https://majestic-melba-33846c.netlify.app`** — its fonts, palette, entrance,
+hero, olive Save the Dates panel, card paintings and closing. The details are
+this card's own: lineage, scratch card, countdown, map, Blessings, RSVP.
+
+- **Type:** Italiana for the names and the door title; Cormorant Garamond for
+  reading and for every section heading; Cinzel for the SAVE THE DATES title
+  only; DM Sans for eyebrows and small caps.
+- **Palette:** `--deep-ink #313b29`, `--ink-2 #474936`, `--olive-ink #6d7654`,
+  `--gold-ink #ae8950`, on `--card-ground #f9f5ed` / `--page-ground #f6f0e6`.
+  The older token names (`--ivory`, `--gold`, `--ink`, `--ink-soft`) are kept as
+  aliases of these. Both cards share one design — the groom's card is no longer
+  pink.
+- **Artwork:** `assets/gate/royal-doors.jpg`, `assets/hero/floral-frame.jpg`
+  (hero, Save the Dates, Blessings and footer all use it),
+  `assets/hero/gold-divider.svg`, and `assets/cards/{haldi,sangeet,wedding}-card.jpg`.
+  The two card PNGs from the site were 2.6–2.9 MB each and are re-encoded as
+  JPEG at the same size.
+
+## The entrance
+
+**Two doors and a button**, as on the announcement site. One painting is split
+down the middle: each `.door` is half the box wide with `background-size:
+200%`, so shut they read as one pair. **Open invitation** slides each off its
+own side over 1.55s, starts the score (inside the click, so browsers allow
+it), reveals the hero, and removes the entrance at 1.6s. The film gate it
+replaced, and all its crop and skip logic, is gone.
+
 ## Save the dates
 
-Three cards, built from `CONFIG.events`. Tapping one expands it in place into
-the full invitation using a FLIP: the card jumps to its opened geometry, both
-boxes are measured, and only the inverse transform is animated back to zero,
-so nothing reflows mid-flight.
-
-Every card that has a film takes its closed face from that film — a single
-frame cut out of it (`assets/cards/*-still.jpg`) — so the shut card and the
-opened one are the same scene, and no two cards on a page look alike. The
-still doubles as the video's poster, so opening a card has nothing to flash
-through. The films are `preload="none"`: a grid of cards must not pull a video
-each on load.
+Three cards on the olive panel, built from `CONFIG.events`. Each is one of
+the couple's paintings, in one of three colourways (`event--marigold`,
+`--stars`, `--breeze`) whose inks are taken card by card from the reference.
+Shut, a card shows the name, the date and "Tap to unfold". Tapping it grows it
+to a near full-height card with a FLIP — the card jumps to its opened
+geometry, both boxes are measured, and only the inverse transform is animated
+(1.1s, as the reference does it). The wording fades in once it has nearly
+landed, set in the painting's open sky at `--pop-top`.
 
 **No card says whose side a function is on.** Guests are told what they are
 invited to by their own link; the cards read the same for everyone.
@@ -141,78 +166,39 @@ One thing not to undo: **the backdrop hangs off `.schedule`, not off `body`.**
 `.schedule` carries a `z-index` and is therefore its own stacking context, so
 a backdrop painted at body level can never come between the section and one
 of the section's own children — the opened card would render *underneath* the
-dim.
+dim. For the same reason nothing inside `.schedule` may take a `z-index` of its
+own: the floral is `::before`, the inset frame is an `outline`, and the
+children are only `position: relative`.
 
 Escape, the × button, and a tap on the backdrop all close.
 
-## The gate
+## RSVP
 
-**Both cards open on the same film**, `assets/video/gate.mp4` — 720×1280
-portrait, ten seconds. It starts on the closed doors, pushes through the arch
-and ends on the Amaraa Farms sign revealed beyond them. That last frame is the
-hand-off to the hero, so the gate runs the film out and hands over on its own
-`ended` event rather than cutting it short.
+This card's contact — call or WhatsApp — and then the **reply form**: name,
+phone number, date of arrival, date of departure. Name and phone are required;
+the dates are optional, for guests who are local. The form checks the phone
+looks like a number and that departure is not before arrival.
 
-It replaced two films that were different per side, both from the cloned card:
-a Rumi Darwaza on the bride's and a sealed envelope on the groom's. Both have
-been deleted.
+Replies go to a **Google Sheet**, through the Apps Script web app in
+[`rsvp-sheet/Code.gs`](rsvp-sheet/Code.gs) — its header says how to deploy
+it. Paste the web app's `/exec` URL into `CONFIG.rsvpForm.endpoint`. **Until
+then the form shows, but tells a guest it cannot send yet and to call
+instead.** Each row records which card it came from.
 
-A film is laid out at **its own aspect ratio**, or the element letterboxes
-inside its box and the gate shows side bands. `data-shape="portrait"` picks
-the portrait geometry; swap in a film of another shape and the `aspect-ratio`
-and the `width: max(…)` that keeps it covering the screen move together.
-
-The source burns a **sparkle in the bottom-right corner**, so the portrait rule
-cuts 15% off the bottom — checked against the first frame and the last — and
-pushes the element down by half the cut to re-centre what survives it. Taking
-it off the right instead would cost much more of the arch.
-
-**The film carries no wording**, so `.intro-prompt` is the only thing telling a
-guest to tap. It is not decoration. The groom's card went without it while his
-gate was the envelope, which had "Tap to open" printed into the frame; it is
-back now that both cards share a silent film. Once the gate is plainly moving
-the prompt turns into "Tap to skip" — and because one physical tap fires
-`pointerdown`, then `touchend`, then `click`, `SKIP_AFTER_MS` is the grace
-window that stops that cascade opening the gate and slamming it in the same
-gesture.
-
-`data-film-end` is the escape hatch for a film that runs on past the moment
-that matters — it pauses there and hands over instead. No card sets it today;
-the envelope film needed it, because its source cut to a blue backdrop.
-
-If the film fails to load, the gate removes itself rather than leaving a tap
-that does nothing.
+- Apps Script sends no CORS headers, so the post is `no-cors`: the response
+  is opaque, and the form can only tell a sent request from a network failure.
+- The hidden `website` field is a honeypot; a reply that fills it is dropped.
+- The script stores any value starting `= + - @` as text, so a reply can never
+  run as a formula in the sheet.
+- Guests' phone numbers go to the sheet only — never into this public repo.
 
 ## The hero card
 
-What the gate opens onto: eyebrow, ॐ in a gold ring, the names in **Pinyon
-Script**, the invitation sentence, and the dates between gold rules. Setting
-`markImage` on a side puts a painting in that ring instead and opens it out
-into a framed panel; nothing ships with one, because the painting that was
-here belonged to the family this card was cloned from. The
-palette lives in its own tokens — `--card-ground`, `--deep-ink`, `--olive-ink`,
-`--gold-ink` — kept apart from the watercolour tokens that dress the gate,
-blessings, RSVP and countdown.
-
-### The floral ground, and why it is not `background.png`
-
-The supplied `background.png` is **3811×1902, landscape 2:1**, with artwork
-only on the left **31%** and the right **19%** and an empty middle of
-**49.5%**. Cover-fitted to a 480-wide portrait column it shows the middle
-27% — which is the empty part. **Every flower crops away.**
-
-So the two bands were cut out and rebuilt as a portrait frame,
-`assets/hero/floral_frame.webp` (1200×2100, 83 KB against the original's
-5 MB): left band top-left and turned 180° for bottom-right, right band
-top-right and turned for bottom-left, over a ground sampled from the
-original's own middle (`#f7f2ed`). Each band's two inward edges are erased to
-a gradient — without that the rectangles show as hard seams against the
-ground.
-
-**Replacing it:** a portrait export of the same artwork can be dropped
-straight in and the re-composition thrown away. Another landscape one needs
-the same treatment, and the band boundaries have to be re-measured — they are
-specific to this file.
+What the doors open onto: eyebrow, ॐ in a gold ring, the names in
+**Italiana** with the lineage under each, and the invitation sentence, on the
+floral ground with the reference's veil. Setting `markImage` on a side puts a
+painting in that ring instead and opens it out into a framed panel; nothing
+ships with one.
 
 ## Where the celebration is
 
@@ -223,38 +209,26 @@ The frame is desaturated a little so the bright blue map sits inside the
 invitation rather than on top of it, and the "Open in Maps" button is held
 clear of Google's attribution strip, which their terms require stay legible.
 
-Both cards carry this section, because both sides gather at the same venue.
-
 ## The countdown and the close
 
 The countdown is **four small boxes, not a screen**. It sits between the
 scratch card and the cards, and the scratch section is deliberately
-content-height rather than `100svh` so the two read as one panel — heading,
-bar, couple, then the boxes. Put `min-height: 100svh` back on
-`.scratch-section` and the countdown is pushed onto a screen of its own again.
+content-height rather than `100svh` so the two read as one panel. The
+scratch section wears the reference's "celebration of love" treatment: its
+floral washed back to paper, with the gold divider on the seam above.
 
-The footer closes on the **same floral ground as the hero**, untreated — same
-artwork, same daylight, both ends of the invitation. The only thing over it is
-the hero's own veil: a soft cream lift through the middle so the type holds,
-and a seam at the top so the panel above runs into it. Because it is the same
-file there is no second image to load.
+The footer closes as the reference does: blush to paper, the floral pressed
+faintly in, "With love, Mahima & Ayush" in Cormorant. **No hashtag** — it was
+removed at the family's request; `CONFIG.couple.hashtag` is empty.
 
 ## Assets
 
-Everything the site loads lives in `assets/`. Root-level `*.mp4` and `*.mp3`
-are gitignored, so working files dropped in the folder stay out of the repo.
-`background.png` is the one source kept on disk: the hero's floral frame was
-re-composed from it and cannot be re-cut from the derived WebP.
+Everything the site loads lives in `assets/`, and nothing there is
+unreferenced. Root-level `*.mp4`, `*.mp3`, `*.jpg` and `*.jpeg` are
+gitignored, so working files dropped in the folder stay out of the repo.
 
 `music/ishq-hai.mp3` comes in at **0:38** — `MUSIC_START` in `script.js` — and
 the `<audio>` carries no `loop`, because looping natively would drop back to 0
 and replay the intro; the loop is re-seeded on `ended` instead. **It is the
 previous couple's track**; a different song needs `MUSIC_START` changed or
 removed, and deleting the file simply hides the music button.
-
-Nothing in `assets/` is unreferenced. The films and stills for functions this
-celebration does not have — Hawan, Mehendi, Reception — were deleted along with
-the two retired gate films, which is about 25 MB of the previous card's media.
-`gate.mp4` and `gate_poster.jpg` are the only media supplied for this
-invitation; see [`DETAILS-NEEDED.md`](DETAILS-NEEDED.md) §3 for what is still
-borrowed.

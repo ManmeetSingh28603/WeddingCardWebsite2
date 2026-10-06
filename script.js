@@ -16,7 +16,8 @@ let CONFIG = {
     bride:   'Mahima',
     groom:   'Ayush',
     venue:   'Amaraa Farms, Lucknow',
-    hashtag: '#MahimaWedsAyush',
+    /* Removed at the family's request; empty takes the line off the page. */
+    hashtag: '',
   },
 
   dates: {
@@ -108,15 +109,16 @@ let CONFIG = {
 
        at     when the countdown aims at this function; noon if absent
        art    the painting behind the card
-       theme  which particle treatment plays: marigold | stars | breeze
+       theme  which particle treatment plays, and which of the three
+              colourways in style.css dresses the card: marigold (light,
+              warm), stars (night), breeze (light, rose)
        dress  optional guest colour code, printed under the venue.
               The family asked for none, so no function sets it.
 
-     Every card that has a film takes its closed face from that film — a
-     single frame cut out of it (assets/cards/*-still.jpg) — so the shut
-     card and the opened one are the same scene, and no two cards on a page
-     look alike. The still doubles as the video's poster, so opening a card
-     has nothing to flash through. */
+     The art is the couple's own, from their announcement site. Each
+     painting leaves its top half clear for the wording and puts the couple
+     at the foot, so an opened card is the whole painting with the words
+     set in the sky. */
   events: [
     {
       id: 'haldi', title: 'Haldi',
@@ -124,10 +126,7 @@ let CONFIG = {
       time: '11:00 am onwards',
       at: { h: 11, min: 0 },
       copy: 'Join us for a sunshine-soaked Haldi carnival filled with music, colour, games, food and endless laughter.',
-      art: 'assets/cards/haldi-mehendi-still.jpg', theme: 'marigold',
-      /* Light scene, so the wording stays dark. filmCrop drops the bottom
-         of the frame, where this source carries its generator's mark. */
-      film: 'assets/video/haldi-mehendi-bg.mp4', filmCrop: 'bottom',
+      art: 'assets/cards/haldi-card.jpg', theme: 'marigold',
     },
     {
       id: 'sangeet', title: 'Sangeet',
@@ -135,10 +134,7 @@ let CONFIG = {
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
       copy: 'An evening of dance, music, laughter, food and fun — come ready to celebrate under the stars.',
-      /* The ballroom — a dancing floor under chandeliers. A night scene, so
-         the wording flips to cream. */
-      art: 'assets/cards/sangeet-still.jpg', theme: 'stars',
-      film: 'assets/video/sangeet-bg.mp4', filmTone: 'night',
+      art: 'assets/cards/sangeet-card.jpg', theme: 'stars',
     },
     {
       id: 'wedding', title: 'Wedding',
@@ -146,8 +142,7 @@ let CONFIG = {
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
       copy: 'Join us for an evening of sacred vows, sparkling celebrations, music and love as we begin our forever together.',
-      art: 'assets/cards/wedding-still.jpg', theme: 'breeze',
-      film: 'assets/video/wedding-bg.mp4',
+      art: 'assets/cards/wedding-card.jpg', theme: 'breeze',
     },
   ],
 
@@ -179,8 +174,7 @@ let CONFIG = {
 
   /* `tel` is the full international form behind the call and WhatsApp
      links; `shown` is what is printed on the page. Each card lists only
-     its own side. An empty list takes the whole RSVP section off that card
-     rather than printing a heading with nothing under it. */
+     its own side, without saying whose side it is. */
   rsvp: {
     bride: [
       { name: 'Prem Sagar Pal', tel: '918318526297', shown: '+91 83185 26297' },
@@ -188,6 +182,14 @@ let CONFIG = {
     groom: [
       { name: 'Gayatri Srivastava', tel: '917275251099', shown: '+91 72752 51099' },
     ],
+  },
+
+  /* The RSVP form posts to a Google Apps Script web app that appends a row
+     to a Google Sheet — the script, and how to deploy it, are in
+     rsvp-sheet/Code.gs. Paste the web app's /exec URL here. While it is
+     empty the form still shows, but says it cannot send yet. */
+  rsvpForm: {
+    endpoint: '',
   },
 };
 
@@ -287,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFooter();
   initBlessings();
   initRsvp();
+  initRsvpForm();
   initCountdownSection();
   initScratch();
 });
@@ -496,11 +499,7 @@ function renderEventCards() {
 
   visibleEvents().forEach((ev, i) => {
     const card = document.createElement('article');
-    /* filmTone: 'night' flips the opened card to a dark veil and cream
-       type — deep ink over a night sky reads as nothing. */
-    card.className = `event event--${ev.theme || 'marigold'}`
-      + (ev.film ? ' has-film' : '')
-      + (ev.film && ev.filmTone === 'night' ? ' has-film--night' : '');
+    card.className = `event event--${ev.theme || 'marigold'}`;
     card.id = `evt-${ev.id}`;
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
@@ -510,14 +509,6 @@ function renderEventCards() {
     /* `note` is optional: an empty one prints nothing at all rather than
        an empty row. */
     const note  = ev.note  ? `<p class="event-note">${ev.note}</p>` : '';
-    /* preload="none": the film is only wanted once the card is opened, and
-       a grid of six must not pull six videos on load. The still art is the
-       poster, so the swap has nothing to flash through. */
-    const film  = ev.film
-      ? `<video class="event-film" src="${ev.film}"${ev.art ? ` poster="${ev.art}"` : ''}${ev.filmCrop ? ` data-crop="${ev.filmCrop}"` : ''}
-                muted loop playsinline webkit-playsinline preload="none"
-                disablepictureinpicture aria-hidden="true"></video>`
-      : '';
     const when  = `${ev.day}<sup>${ev.suffix}</sup> ${ev.month}`;
     /* The couple's own name for a function goes on top; the function it
        actually is goes underneath it, in both the shut and opened card. */
@@ -540,7 +531,6 @@ function renderEventCards() {
 
     card.innerHTML =
       `<div class="event-art" aria-hidden="true"></div>
-       ${film}
        <div class="event-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
        <div class="event-summary">
          <h3 class="event-name">${ev.title}</h3>
@@ -548,7 +538,7 @@ function renderEventCards() {
          <p class="event-day">${when}</p>
          <p class="event-time">${ev.time}</p>
          ${note}
-         <p class="event-open">Tap to open</p>
+         <p class="event-open">Tap to unfold</p>
        </div>
        <button class="event-close" type="button" aria-label="Close ${stripTags(ev.title)} invitation">&times;</button>
        <div class="event-detail">
@@ -595,19 +585,6 @@ function initEventCards() {
     card.setAttribute('aria-expanded', String(opening));
     openCard = opening ? card : null;
 
-    /* The film runs only while the card is open — a closed card must not
-       leave a video decoding behind the grid. */
-    const film = card.querySelector('.event-film');
-    if (film) {
-      if (opening) {
-        try { film.currentTime = 0; } catch (_) {}
-        const play = film.play();
-        if (play && play.catch) play.catch(() => {});   /* the still stands in */
-      } else {
-        film.pause();
-      }
-    }
-
     const last = card.getBoundingClientRect();
     const dx = first.left - last.left;
     const dy = first.top - last.top;
@@ -623,8 +600,10 @@ function initEventCards() {
       ? `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
       : `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
 
+    /* The reference unfolds its cards slowly — 1.1s — and the wording only
+       fades in once the card has nearly landed (see .event-detail). */
     card.animate([{ transform: inverse }, { transform: base }],
-                 { duration: 620, easing: 'cubic-bezier(.16,.82,.24,1)', fill: 'both' });
+                 { duration: 1100, easing: 'cubic-bezier(.16,.82,.24,1)', fill: 'both' });
   };
 
   cards.forEach((card) => {
@@ -690,9 +669,11 @@ function renderBlessings() {
 
   if (!wantsBlessings()) { host.remove(); return; }
 
-  const page = (side, label, blocks, note) => {
+  /* No "Bride's Side" / "Groom's Side" label: each card carries only its own
+     family's list, so naming the side says nothing a guest needs. */
+  const page = (side, blocks, note) => {
     const art = el('article', `bl-page bl-page--${side}`);
-    art.setAttribute('aria-label', `Blessings — ${label}`);
+    art.setAttribute('aria-label', 'Blessings');
     art.appendChild(Object.assign(el('div', 'bl-art'), { ariaHidden: 'true' }));
 
     const inner = el('div', 'bl-inner');
@@ -700,7 +681,6 @@ function renderBlessings() {
       '<span class="bl-rule-line"></span><span class="bl-rule-diamond">&#9670;</span><span class="bl-rule-line"></span>'));
     inner.appendChild(el('h2', 'bl-heading', 'Blessings'));
     if (note) inner.appendChild(el('p', 'bl-note', note));
-    inner.appendChild(el('p', 'bl-side', label));
 
     blocks.forEach(b => {
       const blk = el('div', 'bl-block');
@@ -716,27 +696,26 @@ function renderBlessings() {
   /* Whichever side's card this is, and only if that side has a list. */
   const list = CONFIG.blessings[SIDE];
   if (!list || !list.length) { host.remove(); return; }
-  host.appendChild(page(SIDE, SIDE === 'groom' ? 'Groom’s Side' : 'Bride’s Side',
-                        list, CONFIG.blessings.note));
+  host.appendChild(page(SIDE, list, CONFIG.blessings.note));
 }
 
 function renderRsvp() {
   const host = document.getElementById('rsvpLists');
   if (!host) return;
 
-  /* No numbers for this side means no RSVP at all: a heading, a rule and
-     the line under it with nothing beneath them is worse than
-     silence. Fill in CONFIG.rsvp and the section returns by itself. */
+  /* No numbers for this side: the list and the "please call" line go, and
+     the form carries the section on its own. */
   const contacts = CONFIG.rsvp.bride;
   if (!contacts || !contacts.length) {
-    document.getElementById('rsvp')?.remove();
+    host.remove();
+    document.querySelector('.rsvp-note')?.remove();
     return;
   }
 
-  const list = (label, people) => {
-    host.appendChild(el('p', 'rsvp-side', label));
+  /* No side label over the list — each card shows only its own contact. */
+  const list = (people) => {
     const ul = el('ul', 'rsvp-contacts');
-    ul.setAttribute('aria-label', `${label} contacts`);
+    ul.setAttribute('aria-label', 'Contacts');
     people.forEach(p => {
       const li = el('li', 'rsvp-row');
       /* A contact with no number gets no buttons: `tel:+` and a bare wa.me
@@ -761,9 +740,65 @@ function renderRsvp() {
     host.appendChild(ul);
   };
 
-  /* The numbers come from SIDE_CONFIG, so the heading has to follow the
-     side too — the groom's card was listing his mother under "Bride's Side". */
-  list(SIDE === 'groom' ? 'Groom’s Side' : 'Bride’s Side', CONFIG.rsvp.bride);
+  list(CONFIG.rsvp.bride);
+}
+
+/* The reply form. Posts to the Apps Script web app in
+   CONFIG.rsvpForm.endpoint, which appends a row to the family's sheet.
+   Apps Script sends no CORS headers, so the request goes out as no-cors:
+   the response is opaque, and a resolved fetch is the only success signal
+   there is. A network failure still rejects, and is reported as such. */
+function initRsvpForm() {
+  const form = document.getElementById('rsvpForm');
+  if (!form) return;
+  const status = document.getElementById('rsvpStatus');
+  const button = form.querySelector('.rsvp-submit');
+  const say = (text, kind) => {
+    status.textContent = text;
+    status.dataset.kind = kind || '';
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const name = String(data.get('name') || '').trim();
+    const phone = String(data.get('phone') || '').trim();
+    const arrival = String(data.get('arrival') || '');
+    const departure = String(data.get('departure') || '');
+
+    if (!name) { say('Please tell us your name.', 'error'); form.elements.name.focus(); return; }
+    if (!/^\+?[\d\s()-]{7,20}$/.test(phone)) {
+      say('Please enter a phone number we can reach you on.', 'error');
+      form.elements.phone.focus();
+      return;
+    }
+    /* ISO dates compare correctly as strings */
+    if (arrival && departure && departure < arrival) {
+      say('The departure date is before the arrival date.', 'error');
+      form.elements.departure.focus();
+      return;
+    }
+    if (data.get('website')) { say('Thank you — we have your RSVP.', 'ok'); form.reset(); return; }
+
+    const endpoint = (CONFIG.rsvpForm || {}).endpoint;
+    if (!endpoint) { say('Replies cannot be sent just yet — please call instead.', 'error'); return; }
+
+    button.disabled = true;
+    say('Sending…');
+    try {
+      await fetch(endpoint, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: new URLSearchParams({ side: SIDE, name, phone, arrival, departure }),
+      });
+      form.reset();
+      say('Thank you — we have your RSVP.', 'ok');
+    } catch (_) {
+      say('That did not go through. Please check your connection and try again.', 'error');
+    } finally {
+      button.disabled = false;
+    }
+  });
 }
 
 
@@ -792,7 +827,7 @@ function initBlessings() {
   if (!section) return;
 
   section.querySelectorAll('.bl-page').forEach((page) => {
-    stagger(page.querySelectorAll('.bl-rule, .bl-heading, .bl-note, .bl-side'), '--bl-delay', 160, 60);
+    stagger(page.querySelectorAll('.bl-rule, .bl-heading, .bl-note'), '--bl-delay', 160, 60);
     /* a low threshold: the page is taller than the viewport, so waiting for
        a fifth of it would hold the masthead back until it had scrolled past */
     revealOnce(page, 'is-visible', { threshold: 0.02 });
@@ -816,7 +851,7 @@ function initRsvp() {
   const section = document.getElementById('rsvp');
   if (!section) return;
 
-  section.querySelectorAll('.rsvp-rule, .rsvp-heading, .rsvp-sub-rule, .rsvp-note, .rsvp-side, .rsvp-row')
+  section.querySelectorAll('.rsvp-rule, .rsvp-heading, .rsvp-sub-rule, .rsvp-note, .rsvp-row, .rsvp-form')
     .forEach((n, i) => n.style.setProperty('--rsvp-delay', `${i * 90}ms`));
 
   if (CFG.reducedMotion) { section.classList.add('is-visible'); return; }
@@ -1013,7 +1048,7 @@ function startBgMusic() {
 
 
 /* ============================================================
-   INTRO  (tap-to-begin gate)
+   ENTRANCE  (the royal doors)
    ============================================================ */
 function lockScroll(on) {
   document.documentElement.style.overflow = on ? 'hidden' : '';
@@ -1022,161 +1057,23 @@ function lockScroll(on) {
 
 function initIntro() {
   const screen = document.getElementById('introScreen');
-  if (!screen) return;
+  const button = document.getElementById('openInvitation');
+  if (!screen || !button) return;
 
-  const film = document.getElementById('introVideo');
-  const dissolve = document.getElementById('ivoryDissolve');
-  const prompt = document.getElementById('introPrompt');
-  const promptText = document.getElementById('introPromptText');
-
-  let begun = false, finished = false, touchHandled = false, begunAt = 0;
   lockScroll(true);
+  button.focus({ preventScroll: true });
 
-  const finish = () => {
-    if (finished) return;
-    finished = true;
-    if (prompt) prompt.classList.add('is-gone');
+  let opened = false;
+  button.addEventListener('click', () => {
+    if (opened) return;
+    opened = true;
+    /* Inside the click, so the gesture's activation covers the score;
+       startBgMusic carries its own retry net if the browser refuses. */
     startBgMusic();
-    screen.classList.add('is-fading');
-
-    /* The veil must be shut BEFORE the hero is revealed and before the card
-       starts fading off it, or the scene shows through the fade. Ask the
-       hero whether the flight is armed rather than running it first: this
-       is the one ordering that guarantees no glimpse. */
-    const hero = document.getElementById('hero');
-    /* No flight any more — the crest that used to fly from the opening
-       card into the hero went when the hero became the floral card. The
-       veil simply cross-dissolves. */
-    const holding = false;
-
-    if (dissolve) {
-      if (holding) dissolve.classList.add('is-hold');   /* opaque immediately */
-      dissolve.classList.add('is-active');
-    }
-
-    let torn = false;
-    const teardown = () => {
-      if (torn) return;
-      torn = true;
-      if (dissolve) dissolve.remove();
-      lockScroll(false);
-    };
-
-    if (holding) {
-      let lifted = false;
-      liftIvoryVeil = () => {
-        if (lifted) return;
-        lifted = true;
-        if (dissolve) dissolve.classList.add('is-lifting');
-        setTimeout(teardown, VEIL_LIFT_MS);
-      };
-      /* safety net: if the landing never reports in, draw the veil back
-         anyway rather than leaving the guest on a blank ivory screen */
-      setTimeout(() => liftIvoryVeil && liftIvoryVeil(), 6500);
-    }
-
+    screen.classList.add('is-open');
     revealHero();
-
-    setTimeout(() => screen.remove(), 1600);
-    /* With no flight there is no landing to wait for, so the plain
-       cross-dissolve keeps its own teardown. */
-    if (!holding) setTimeout(teardown, 2400);
-  };
-
-  const begin = () => {
-    if (begun) return;
-    begun = true;
-    begunAt = Date.now();
-
-    /* The score starts on THIS tap and plays under the film. Called
-       synchronously inside the gesture handler so the activation token
-       covers it; startBgMusic carries its own retry net if refused. */
-    startBgMusic();
-
-    if (!film) { finish(); return; }
-    try { film.currentTime = 0; } catch (_) {}
-    /* the film is silent throughout — a muted play is always permitted, so
-       the gate starts opening instantly even on the pointerdown path */
-    film.muted = true;
-    film.playsInline = true;
-    const p = film.play();
-    /* refused outright: hand over rather than strand the guest on a still */
-    if (p && p.catch) p.catch(() => finish());
-
-    /* Ten seconds is a long time to hold someone at the door, so once the
-       gate is plainly moving the prompt turns into the way out. Delayed so
-       it does not swap under the finger that just tapped it. */
-    if (prompt && promptText) {
-      setTimeout(() => {
-        if (finished) return;
-        promptText.textContent = 'Tap to skip';
-        prompt.classList.add('is-playing');
-      }, 1400);
-    }
-
-    /* The gate film closes on the venue revealed through the open doors —
-       that last frame is the hand-off, so both cards simply run it out and
-       hand over on 'ended'.
-       data-film-end is the escape hatch for a film that runs on past the
-       moment that matters: it pauses there and hands over instead. No card
-       sets it today; the envelope film that needed it did. */
-    const cutAt = parseFloat(film.dataset.filmEnd);
-    const cut = Number.isFinite(cutAt) && cutAt > 0 ? cutAt : null;
-    if (cut) {
-      film.addEventListener('timeupdate', () => {
-        if (film.currentTime >= cut) { film.pause(); finish(); }
-      });
-    }
-    film.addEventListener('ended', finish, { once: true });
-    /* Safety, for when neither arrives: a stalled buffer, a tab sent to the
-       background mid-play. Sized off whichever end comes first, so swapping
-       in a longer film does not silently start cutting it short. */
-    const full = Number.isFinite(film.duration) && film.duration > 0 ? film.duration : 10;
-    const len = cut ? Math.min(cut, full) : full;
-    setTimeout(finish, Math.round(len * 1000) + 6000);
-  };
-
-  /* No film to open — take the gate away entirely rather than leave a tap
-     that does nothing, and arm the score on the first gesture instead. */
-  if (film) {
-    film.addEventListener('error', () => {
-      if (begun || finished) return;
-      finished = true;
-      screen.remove();
-      if (dissolve) dissolve.remove();
-      lockScroll(false);
-      revealHero();
-      ['pointerup', 'touchend', 'click'].forEach((ev) => {
-        document.addEventListener(ev, startBgMusic, { once: true, passive: true });
-      });
-    }, { once: true });
-  }
-
-  /* pointerdown is the earliest possible start; touchend / click / keydown
-     cover the activation-carrying paths. touchHandled stops the synthetic
-     click from firing a second time.
-     A tap once the film is running skips to the invitation — but ONE
-     physical tap fires pointerdown, then touchend, then click, so a bare
-     "already begun means skip" would open the gate and slam it in the same
-     gesture. The grace window is what separates that cascade from a guest
-     genuinely tapping again. */
-  const SKIP_AFTER_MS = 700;
-  const onGesture = () => {
-    if (begun) {
-      if (Date.now() - begunAt > SKIP_AFTER_MS) finish();
-      return;
-    }
-    begin();
-  };
-  const gestureStart = () => { touchHandled = true; onGesture(); };
-  screen.addEventListener('pointerdown', gestureStart, { passive: true });
-  screen.addEventListener('touchend', gestureStart, { passive: true });
-  screen.addEventListener('click', () => {
-    if (touchHandled) { touchHandled = false; return; }
-    onGesture();
-  });
-  screen.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onGesture(); }
+    /* the doors take 1.55s to clear the screen (see .door in style.css) */
+    setTimeout(() => { screen.remove(); lockScroll(false); }, CFG.reducedMotion ? 0 : 1600);
   });
 }
 
@@ -1184,22 +1081,6 @@ function initIntro() {
 /* ============================================================
    HERO
    ============================================================ */
-/* Crest flight beats, measured from the moment the card opens. The whole
-   performance happens against the HELD ivory veil, so nothing of the scene
-   is in sight until the crest is home:
-     500   the crest is struck out of the ivory
-     1300  the gold shine crosses it
-     2400  it sets off for its place
-     3700  it lands — only then does the veil draw back (CSS) */
-/* how long the veil takes to draw back once the crest is home — must match
-   the .is-lifting transition, since it decides when the veil is torn down */
-const VEIL_LIFT_MS = 1100;
-
-/* Set by the intro: draws the held veil back and takes it down. Called by
-   the crest's landing, so the scene arrives with the crest however the
-   flight ended. Idempotent. */
-let liftIvoryVeil = null;
-
 function revealHero() {
   const hero = document.getElementById('hero');
   if (hero) hero.classList.add('is-animated');
@@ -1215,11 +1096,6 @@ function initHero() {
   if (CFG.reducedMotion) { hero.classList.add('is-animated'); return; }
   requestAnimationFrame(() => setTimeout(() => hero.classList.add('is-animated'), 360));
 }
-
-/* Built during the intro, not at the hand-off: creating this element costs
-   an image decode and the rasterising of a full-size mask, and doing that
-   at the moment the card closes is what stalls the first paint of the
-   reveal. Made here, it is warm by the time it is needed. */
 
 /* ============================================================
    SCRATCH TO REVEAL + BLOSSOM SHOWER

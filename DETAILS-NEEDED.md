@@ -17,6 +17,8 @@ Everything the invitation *says* lives in the `CONFIG` object at the top of
 | **The year** | `CONFIG.dates.year` and `CONFIG.dates.moment.y` | Assumed **2026** — see §4. |
 
 The RSVP numbers and the venue address have arrived and are on the card.
+The RSVP form is on both cards; replies go to a Google Sheet once
+`rsvp-sheet/Code.gs` is deployed and its URL is in `CONFIG.rsvpForm.endpoint`.
 The share card (`assets/og/og.jpg`) is the family's own monogram artwork,
 centred on 1200×630 from the `og.jpeg` they sent.
 
@@ -45,15 +47,13 @@ be entirely your own.
 
 | File | What it does | Notes |
 | --- | --- | --- |
-| `assets/hero/floral_frame.webp` | The floral background behind the hero **and** the footer — both ends of the card | It was re-composed from their artwork. Replacing it needs care: see **The floral ground** in `README.md`, which explains why it is a portrait rebuild and what a replacement has to be. |
-| `assets/cards/haldi-mehendi-still.jpg`<br>`assets/cards/sangeet-still.jpg`<br>`assets/cards/wedding-still.jpg` | The face of each shut function card | Generic scenes — a bougainvillea arch, a ballroom, a garden. Each is a frame cut from the film below it, so a replacement has to be cut from the matching film or both change together. |
-| `assets/video/haldi-mehendi-bg.mp4`<br>`assets/video/sangeet-bg.mp4`<br>`assets/video/wedding-bg.mp4` | The film behind each card once it is opened | Same three scenes, moving. |
 | `assets/music/ishq-hai.mp3` | The background score | **This is the song the other family chose.** It starts at 0:38 (`MUSIC_START` in `script.js`), which is tuned to this track — a different song needs that number changed or removed. Delete the file and the music button hides itself; nothing else breaks. |
 | `assets/scratch/couple.webp` | The illustration of the couple under the scratch bar | The previous card's drawing, kept by choice. It is faceless and carries no names. Replace the file to change it. |
 | `assets/music/kamaicha.png`, `bow.png` | The artwork on the music button | Supplied to the previous project. |
 
-`assets/video/gate.mp4` and `assets/hero/gate_poster.jpg` are **yours** — the
-film you sent. Everything else in `assets/` is listed above.
+Everything else in `assets/` is **yours**, from your announcement site: the
+doors, the floral, the gold divider and the three card paintings. The gate
+film and the template's three card films have been removed.
 
 ---
 
@@ -75,15 +75,16 @@ wrote it. Change any of it freely.
 
 - The meta description and share-card title on both pages: *"With love, Mahima & Ayush invite you to celebrate their wedding at Amaraa Farms, Lucknow."*
 - The RSVP line: *"For timings, travel, or anything at all — please call."*
-- The tap prompts on the gate: *"Tap to begin celebration"* (bride) and *"Tap to open the invitation"* (groom).
+- The form heading *"Let us know you are coming"*, its button *"Send RSVP"*, and its messages.
 - *"Scratch to reveal"*, painted into the foil itself by `drawFoil()` in `script.js`.
 - The blessings heading is **empty** — the line that was there was the other family's sign-off. Add your own to `CONFIG.blessings.note` or leave it hidden.
 
 Taken straight from your announcement site and safe to leave: *"Together with
 our families"*, *"With joyous hearts, we invite you…"*, *"Two days, one
 beautiful beginning"*, *"The festivities"*, *"Save the dates"*, *"Find your way
-to us"*, *"We cannot wait to celebrate with you"*, **#MahimaWedsAyush**, and
-the ॐ.
+to us"*, *"We cannot wait to celebrate with you"*, *"We invite you"*, *"Enter the
+celebration"*, *"Open invitation"*, *"Tap to unfold"*, and the ॐ.
+**#MahimaWedsAyush** has been removed, as asked.
 
 ---
 

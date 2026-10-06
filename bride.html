@@ -32,19 +32,17 @@
        monogram. Drop a 32x32 favicon.png and a 180x180 apple-touch-icon.png
        in the root and link them back here. -->
 
-  <!-- Italiana = the couple's names · Cinzel = display caps ·
-       Cormorant Garamond = body · DM Sans = eyebrows and small caps ·
-       Pinyon Script = script accents -->
+  <!-- The faces of the couple's own announcement site: Italiana for the
+       names, Cormorant Garamond for reading and headings, Cinzel for the
+       Save the Dates title, DM Sans for eyebrows and small caps. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500&family=Italiana&family=Pinyon+Script&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500&family=Italiana&display=swap" rel="stylesheet" />
 
-  <!-- The gate's first frame. It is the video's own poster, so it is what
-       stands in until the film has enough buffered to play. -->
-  <link rel="preload" as="image" href="assets/hero/gate_poster.jpg" fetchpriority="high" />
-  <!-- The ground of the card the gate opens onto — wanted the moment the
-       film ends, so it is fetched while the film is still playing. -->
-  <link rel="preload" as="image" href="assets/hero/floral_frame.webp" />
+  <!-- The doors are the first thing on screen, and the floral ground is
+       what they open onto. -->
+  <link rel="preload" as="image" href="assets/gate/royal-doors.jpg" fetchpriority="high" />
+  <link rel="preload" as="image" href="assets/hero/floral-frame.jpg" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -88,46 +86,27 @@
 <div id="device-frame">
 
   <!-- ============================================================
-       Intro — tap-to-begin gate.
-       assets/video/gate.mp4 is the gate, and BOTH cards open on it: it
-       starts on the closed doors, pushes through the arch, and ends on
-       the Amaraa Farms sign revealed beyond them — that last frame is the
-       hand-off to the hero. The tap plays it through and starts the score
-       under it.
-       The film carries NO wording of its own, so the prompt below is the
-       only thing telling a guest to tap — it is not decoration, do not
-       drop it.
-       720x1280 portrait, so data-shape drives the crop that loses the
-       generator's sparkle; see .intro-film in the stylesheet.
+       Entrance — the royal doors, as on the couple's own announcement
+       site. One image, assets/gate/royal-doors.jpg, is split down the
+       middle: each door carries half of it and slides off its own side
+       when the button is pressed. The press is also what starts the score.
        ============================================================ -->
-  <div class="intro-screen is-active" id="introScreen" role="button" tabindex="0"
-       aria-label="Tap to begin celebration">
-    <div class="intro-paper" aria-hidden="true"></div>
-    <video class="intro-film" id="introVideo"
-           data-shape="portrait"
-           src="assets/video/gate.mp4"
-           poster="assets/hero/gate_poster.jpg"
-           muted playsinline webkit-playsinline preload="auto"
-           disablepictureinpicture aria-hidden="true"></video>
-    <div class="intro-scrim" aria-hidden="true"></div>
-    <div class="intro-prompt" id="introPrompt" aria-hidden="true">
-      <span class="intro-prompt-rule"></span>
-      <span class="intro-prompt-text" id="introPromptText">Tap to begin celebration</span>
-      <span class="intro-prompt-rule"></span>
+  <div class="entrance" id="introScreen">
+    <div class="door door-left" aria-hidden="true"></div>
+    <div class="door door-right" aria-hidden="true"></div>
+    <div class="door-copy">
+      <p class="door-eyebrow">We invite you</p>
+      <h2 class="door-title">Enter the celebration</h2>
+      <button class="open-button" id="openInvitation" type="button">Open invitation</button>
     </div>
   </div>
-  <div class="ivory-dissolve" id="ivoryDissolve" aria-hidden="true"></div>
 
 
   <!-- ============================================================
        Hero — the invitation card itself.
 
-       The floral ground is assets/hero/floral_frame.webp, re-composed
-       from the supplied background.png: that original is landscape 2:1
-       with its artwork only on the left 31% and right 19%, so cover-
-       fitting it to a phone showed nothing but the empty middle. The
-       two bands were cut out and rebuilt as a portrait frame — see the
-       README before replacing it.
+       The floral ground is assets/hero/floral-frame.jpg, the artwork from
+       the couple's own announcement site.
        ============================================================ -->
   <section class="hero-screen" id="hero" aria-label="Wedding invitation">
     <div class="hero-frame" aria-hidden="true"></div>
@@ -187,7 +166,6 @@
            draggable="false" loading="lazy" decoding="async"
            onerror="this.style.display='none'" />
 
-      <p class="scratch-hashtag" id="scratchHashtag" data-hashtag></p>
     </div>
   </section>
 
@@ -262,8 +240,7 @@
 
 
   <!-- ============================================================
-       RSVP — call / WhatsApp from CONFIG.rsvp. With no numbers on
-       file the section takes itself off the page.
+       RSVP — call / WhatsApp from CONFIG.rsvp, then the reply form.
        ============================================================ -->
   <section class="rsvp" id="rsvp" aria-label="RSVP">
     <div class="rsvp-inner">
@@ -275,13 +252,33 @@
       <p class="rsvp-note">For timings, travel, or anything at all &mdash; please call.</p>
       <div id="rsvpLists"></div>
 
-      <!-- A plain anchor, with the real URL in the markup: the venue has to
-           be findable even if script.js never runs. -->
-      <!-- The map button that used to sit here is gone. The Venue section
-           above carries the address and the embed now, and two ways to
-           open the same place a screen apart is one too many. -->
-
-
+      <!-- The guest's reply. Sent to the Google Sheet behind
+           CONFIG.rsvpForm.endpoint — see rsvp-sheet/Code.gs. The hidden
+           "website" field is a honeypot: people never see it, bots fill it. -->
+      <form class="rsvp-form" id="rsvpForm" novalidate>
+        <p class="rsvp-form-title">Let us know you are coming</p>
+        <label class="rsvp-field">
+          <span>Name</span>
+          <input type="text" name="name" autocomplete="name" maxlength="80" required />
+        </label>
+        <label class="rsvp-field">
+          <span>Phone number</span>
+          <input type="tel" name="phone" autocomplete="tel" inputmode="tel" maxlength="20" required />
+        </label>
+        <div class="rsvp-dates">
+          <label class="rsvp-field">
+            <span>Date of arrival</span>
+            <input type="date" name="arrival" />
+          </label>
+          <label class="rsvp-field">
+            <span>Date of departure</span>
+            <input type="date" name="departure" />
+          </label>
+        </div>
+        <input class="rsvp-trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <button class="rsvp-submit" type="submit">Send RSVP</button>
+        <p class="rsvp-status" id="rsvpStatus" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </section>
 
@@ -301,7 +298,6 @@
         With love,<br /><span data-couple-names>Mahima &amp; Ayush</span>
       </h2>
       <p class="footer-line countdown-reveal" style="--countdown-delay:430ms">We cannot wait to celebrate with you</p>
-      <p class="footer-hashtag countdown-reveal" data-hashtag style="--countdown-delay:580ms"></p>
     </div>
   </footer>
 

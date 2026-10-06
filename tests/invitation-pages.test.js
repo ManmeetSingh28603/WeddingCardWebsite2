@@ -12,14 +12,20 @@ for (const f of ['index.html', 'bride.html', 'groom.html',
   assert.ok(has(f), f + ' must exist');
 }
 
-/* ── the media each gate and each filmed card actually needs ── */
-for (const f of ['assets/video/gate.mp4',               // the gate, both cards
-                 'assets/hero/gate_poster.jpg',         // and its held first frame
-                 'assets/video/haldi-mehendi-bg.mp4',   // Haldi card
-                 'assets/video/sangeet-bg.mp4',         // Sangeet card
-                 'assets/video/wedding-bg.mp4',         // Wedding card
+/* ── the artwork the design actually loads ── */
+for (const f of ['assets/gate/royal-doors.jpg',   // the entrance doors
+                 'assets/hero/floral-frame.jpg',  // hero, schedule, blessings, footer
+                 'assets/hero/gold-divider.svg',
+                 'assets/cards/haldi-card.jpg',
+                 'assets/cards/sangeet-card.jpg',
+                 'assets/cards/wedding-card.jpg',
                  'assets/music/ishq-hai.mp3']) {
   assert.ok(has(f), f + ' must exist');
+}
+/* ── and the gate film and template films it replaced are gone ── */
+assert.ok(!has('assets/video'), 'the gate and card films were replaced and must stay deleted');
+for (const f of ['assets/hero/floral_frame.webp', 'assets/hero/gate_poster.jpg']) {
+  assert.ok(!has(f), f + ' was replaced and must stay deleted');
 }
 
 const bride = read('bride.html');
@@ -81,65 +87,62 @@ for (const [what, src] of everything) {
 /* ── the postal address, as the family wrote it ── */
 assert.match(script, /address: 'Amaraa Farms and Resort, Arjunganj, Lucknow, Uttar Pradesh 226002'/);
 
-/* ── Confirm Your Presence is GONE, not merely switched off: the form, its
-      styling, its glyphs, its link parameter and its builder tick box ── */
+/* ── the old cloned card's form stays gone; the new one is the RSVP form ── */
 for (const [what, src] of everything) {
   assert.doesNotMatch(src, /attendance|attendParam|Confirm Your Presence|Aadhaar|af-submit|attend-done/i,
-                      'the attendance form must not linger in ' + what);
+                      'the cloned card’s attendance form must not linger in ' + what);
 }
-for (const [name, page] of pages) {
-  assert.doesNotMatch(page, /ic-upload|ic-check/,
-                      name + ' keeps glyphs only the removed form used');
-}
-assert.doesNotMatch(css, /\.af-|\.attend/, 'the attendance styling must be gone too');
-assert.doesNotMatch(script, /\bwantsAttendance\b|\binitAttendance\b/);
-assert.ok(!has('apps-script'), 'the form backend must be gone with the form');
+assert.ok(!has('apps-script'), 'the cloned card’s form backend must stay gone');
 
-/* ── an RSVP with nobody to call takes itself off the page ── */
-assert.match(script, /document\.getElementById\('rsvp'\)\?\.remove\(\);/,
-             'an empty contact list must remove the section, not print an empty heading');
+/* ── RSVP: this card's contact, then the reply form ── */
 assert.match(script, /tel: '918318526297'/, 'the bride’s side has a number to call');
 assert.match(script, /tel: '917275251099'/, 'the groom’s side has a number to call');
-
-/* ── one gate film, on both cards, cropped as the portrait it is ── */
 for (const [name, page] of pages) {
-  assert.match(page, /<video class="intro-film"/, name + ' needs a gate film');
-  assert.match(page, /src="assets\/video\/gate\.mp4"/, name + ' opens on the gate film');
-  assert.match(page, /poster="assets\/hero\/gate_poster\.jpg"/, name + ' needs the held first frame');
-  assert.match(page, /data-shape="portrait"/, name + ' film is portrait and is cropped as such');
-  assert.doesNotMatch(page, /opening\.mp4|envelope-opening\.mp4|opening_poster|envelope_poster/,
-                      name + ' must not still reach for a retired gate');
-  /* The gate ends on the venue reveal, so it runs out rather than being cut
-     short. A data-film-end here would throw away the hand-off. */
-  assert.doesNotMatch(page, /data-film-end/, name + ' must run the gate film to its end');
-  /* The film carries no wording of its own, so this is the whole
-     instruction — the groom's card went without it while his gate was the
-     envelope, which had "Tap to open" printed into it. */
-  assert.match(page, /class="intro-prompt"[\s\S]{0,260}intro-prompt-text/,
-               name + ' gate would have nothing telling a guest to tap');
+  assert.match(page, /<form class="rsvp-form" id="rsvpForm"/, name + ' carries the RSVP form');
+  for (const field of ['name', 'phone', 'arrival', 'departure']) {
+    assert.match(page, new RegExp('<input[^>]*name="' + field + '"'), name + ' form asks for ' + field);
+  }
+  assert.match(page, /type="date" name="arrival"/, name + ' arrival is a date');
+  assert.match(page, /type="date" name="departure"/, name + ' departure is a date');
+  assert.match(page, /class="rsvp-trap"[^>]*name="website"/, name + ' form needs its honeypot');
 }
+assert.match(script, /rsvpForm: \{\s*endpoint: '/, 'the form posts to a configured endpoint');
+assert.match(script, /mode: 'no-cors'/, 'Apps Script sends no CORS headers');
+assert.ok(has('rsvp-sheet/Code.gs'), 'the sheet script must ship with its setup notes');
+assert.match(read('rsvp-sheet/Code.gs'), /\^\[=\+\\-@\]/, 'replies must not be stored as live formulas');
 
-/* ── the CSS envelope that the groom's film replaced is gone ── */
-for (const [what, src] of [['groom.html', groom], ['style.css', css], ['script.js', script]]) {
-  assert.doesNotMatch(src, /env-flap|env-seal|env-pocket|env-card|data-gate="envelope"/,
-                      'the CSS envelope must not linger in ' + what);
+/* ── no "Bride's Side" / "Groom's Side" anywhere a guest can read ── */
+for (const [what, src] of [['script.js', script], ['bride.html', bride], ['groom.html', groom]]) {
+  assert.doesNotMatch(src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, ''),
+                      /(Bride|Groom)’s Side|(Bride|Groom)'s Side/,
+                      'a side label must not be printed in ' + what);
 }
+assert.doesNotMatch(css, /\.bl-side|\.rsvp-side/, 'the side-label styling must be gone too');
 
-/* ── the gate shows no names: they belong to the card behind it ── */
+/* ── no hashtag on either card ── */
+assert.match(script, /hashtag: '',/, 'the hashtag is removed');
 for (const [name, page] of pages) {
-  assert.doesNotMatch(page, /intro-couple|data-intro-names/,
-                      name + ' must not put the couple on the gate');
+  assert.doesNotMatch(page, /data-hashtag|MahimaWedsAyush/i, name + ' must not print the hashtag');
 }
-assert.doesNotMatch(css, /\.intro-couple/, 'the gate-names rule must be gone too');
 
-/* ── a film is laid out at ITS OWN aspect ratio, or the element
-      letterboxes inside its own box and the gate shows side bands ── */
-assert.match(css, /\.intro-film \{[^}]*aspect-ratio: 1280 \/ 720/s,
-             'the landscape film needs a landscape box');
-assert.match(css, /\.intro-film\[data-shape="portrait"\] \{[^}]*aspect-ratio: 720 \/ 1280/s,
-             'the portrait film needs a portrait box');
-assert.doesNotMatch(css, /\.intro-prompt \{[^}]*display: none/s,
-                    'the gate would have no instruction at all');
+/* ── the entrance: the royal doors, opened by a button ── */
+for (const [name, page] of pages) {
+  assert.match(page, /class="door door-left"[\s\S]*class="door door-right"/, name + ' needs both doors');
+  assert.match(page, /<button class="open-button" id="openInvitation"/, name + ' needs the open button');
+  assert.doesNotMatch(page, /<video/, name + ' must not carry a film any more');
+}
+assert.match(css, /\.door \{[^}]*background-image: url\("assets\/gate\/royal-doors\.jpg"\)/s);
+assert.match(css, /\.entrance\.is-open \.door-left  \{ transform: translateX\(-102%\); \}/);
+assert.doesNotMatch(css, /intro-film|ivory-dissolve|intro-prompt/, 'the film gate styling must be gone');
+assert.match(script, /startBgMusic\(\);\n    screen\.classList\.add\('is-open'\)/,
+             'the score starts inside the open click');
+
+/* ── the reference's faces, and nothing else ── */
+for (const [name, page] of pages) {
+  assert.match(page, /family=Cinzel[^"]*Cormorant\+Garamond[^"]*DM\+Sans[^"]*Italiana/, name + ' loads the reference fonts');
+  assert.doesNotMatch(page, /Pinyon/, name + ' must not load the old script face');
+}
+assert.doesNotMatch(css, /Pinyon|--font-script/);
 
 /* ── the score: same track both sides, in at 0:38, and NOT natively looped
       (native loop would drop back to 0 and replay the intro) ── */
@@ -150,32 +153,16 @@ for (const [name, page] of pages) {
 assert.match(script, /const MUSIC_START = 38;/);
 assert.match(script, /currentTime = MUSIC_START/);
 
-/* ── the three cards, each on its own film ── */
-assert.match(script, /film: 'assets\/video\/haldi-mehendi-bg\.mp4', filmCrop: 'bottom'/,
-             'the Haldi film needs the crop that loses its generator mark');
-assert.match(script, /film: 'assets\/video\/sangeet-bg\.mp4', filmTone: 'night'/);
-assert.match(script, /film: 'assets\/video\/wedding-bg\.mp4'/);
-assert.match(script, /class="event-film"/);
-assert.match(script, /preload="none"/, 'a grid of cards must not pull a video each on load');
-assert.match(css, /\.event\.is-open \.event-film \{ opacity: 1; \}/);
-assert.match(css, /\.event\.is-open\.has-film--night \.event-detail/,
-             'a night film needs the dark veil, or the type vanishes into it');
-
-/* ── a filmed card opens as the film: full-bleed, no scrim over the
-      picture, and the veil carried by the text block itself ── */
-assert.match(css, /\.event\.is-open\.has-film \{[^}]*height: min\(92svh, 840px\)/s,
-             'a filmed card opens near full-screen');
-assert.match(css, /\.event\.is-open\.has-film::before \{ background: none; \}/,
-             'the all-over scrim must come off, or the film is just a tint');
-assert.match(css, /\.event\.is-open\.has-film \.event-detail \{[^}]*linear-gradient/s,
-             'the wording carries its own fade');
-
-/* ── no two cards on a page may draw the same film: that is what makes two
-      functions look like the same card twice ── */
-const films = {};
-for (const m of script.matchAll(/id: '([a-z]+)'[\s\S]*?film: '([^']+)'/g)) films[m[1]] = m[2];
-const used = Object.values(films);
-assert.equal(new Set(used).size, used.length, 'two cards share a film: ' + used.join(', '));
+/* ── the three cards, each on the couple's own painting, in its own
+      colourway, and no films ── */
+assert.match(script, /art: 'assets\/cards\/haldi-card\.jpg', theme: 'marigold'/);
+assert.match(script, /art: 'assets\/cards\/sangeet-card\.jpg', theme: 'stars'/);
+assert.match(script, /art: 'assets\/cards\/wedding-card\.jpg', theme: 'breeze'/);
+assert.doesNotMatch(script, /film:|event-film|has-film/, 'the cards no longer carry films');
+for (const theme of ['marigold', 'stars', 'breeze']) {
+  assert.match(css, new RegExp('\\.event--' + theme + ' \\{[^}]*--pop-top'), theme + ' needs its colourway');
+}
+assert.match(script, /Tap to unfold/);
 
 /* ── the guest colour code: optional, and the family asked for none ── */
 assert.match(script, /const dress = ev\.dress/);
@@ -191,16 +178,12 @@ for (const [name, page] of pages) {
   assert.match(page, /venueMapFrame/, name + ' carries the map');
 }
 
-/* ── the RSVP list is headed by whichever side's card it is ── */
-assert.match(script, /SIDE === 'groom' \? 'Groom\u2019s Side' : 'Bride\u2019s Side'/);
-
-/* ── lineage, and the descender fix that stops a tail colliding ── */
+/* ── lineage, under names set in Italiana as the reference sets them ── */
 assert.match(script, /D\/O Smt\. Neetu Pal &amp; Shri Prem Sagar Pal/);
 assert.match(script, /S\/O Smt\. Gayatri Srivastava &amp; Shri Vijay Kumar Sahay/);
 assert.match(script, /'Granddaughter of',\s*'Late Shri Kanhaiyalal Pal/);
 assert.match(script, /'Grandson of',\s*'Late Shri Surendra Prasad/);
-assert.match(css, /\.hero-names \{[^}]*--font-script/s, 'the names are set in the script face');
-assert.doesNotMatch(css, /\.hero-names \{[^}]*line-height: \.82/s, 'the clipping line-height must not come back');
+assert.match(css, /\.hero-names \{[^}]*--font-name/s, 'the names are set in Italiana');
 
 /* ── the blessings each side was given ── */
 assert.match(script, /'Prem Sagar Pal',\s*'Neetu Pal',\s*'Garima Pal',/);

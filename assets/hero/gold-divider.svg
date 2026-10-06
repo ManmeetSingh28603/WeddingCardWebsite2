@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 72" fill="none">
+  <g stroke="#B58A42" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <g id="left-flourish">
+      <path d="M18 36h205" opacity=".62"/>
+      <path d="M223 31l5 5-5 5-5-5 5-5Z"/>
+      <path d="M231 36h18"/>
+      <path d="M249 36c13 0 14 13 28 13 13 0 17-13 30-13 12 0 16 8 25 8 7 0 11-5 9-10-2-6-10-8-14-3-4 4-1 10 5 10"/>
+      <path d="M249 36c9 0 11-11 21-11 8 0 13 6 10 12-3 6-11 5-13 0"/>
+    </g>
+    <use href="#left-flourish" transform="translate(720 0) scale(-1 1)"/>
+    <path d="M341 36c3-13 11-23 19-29 8 6 16 16 19 29"/>
+    <path d="M360 7v31M347 18c6 4 10 10 13 19M373 18c-6 4-10 10-13 19"/>
+    <path d="M348 23c-7-1-11-5-14-10 8-1 13 3 14 10ZM372 23c7-1 11-5 14-10-8-1-13 3-14 10Z"/>
+    <path d="M360 38c-8 6-9 14 0 23 9-9 8-17 0-23Z"/>
+  </g>
+</svg>
