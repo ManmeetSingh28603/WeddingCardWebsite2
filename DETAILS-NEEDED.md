@@ -75,7 +75,7 @@ Not borrowed from the cloned card, but not from your announcement either — I
 wrote it. Change any of it freely.
 
 - The meta description and share-card title on both pages: *"With love, Mahima & Ayush invite you to celebrate their wedding at Amaraa Farms, Lucknow."*
-- The RSVP line: *"For timings, travel, or anything at all — please call."*
+- The RSVP line: *"For timings, travel, or anything at all, please call."*
 - The form heading *"Let us know you are coming"*, its button *"Send RSVP"*, and its messages.
 - *"Scratch to reveal"*, painted into the foil itself by `drawFoil()` in `script.js`.
 - The blessings heading is **empty** — the line that was there was the other family's sign-off. Add your own to `CONFIG.blessings.note` or leave it hidden.

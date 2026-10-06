@@ -187,6 +187,14 @@ assert.match(css, /\.event\.is-open::before \{ opacity: 0; \}/);
 assert.match(script, /<\/div>\s*<p class="event-open">Tap to unfold<\/p>/,
              'Tap to unfold must be a direct child of the card, after the summary');
 
+/* ── no em dash in anything a guest reads (comments may keep theirs) ── */
+for (const [name, page] of pages) {
+  assert.doesNotMatch(page.replace(/<!--[\s\S]*?-->/g, ''), /—|&mdash;|&#8212;/,
+                      name + ' prints an em dash');
+}
+assert.doesNotMatch(script.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''), /—|&mdash;/,
+                    'script.js prints an em dash');
+
 /* ── no map button on the cards: the Venue section carries the map ── */
 assert.doesNotMatch(script + css, /event-map-link|Show location on map/);
 

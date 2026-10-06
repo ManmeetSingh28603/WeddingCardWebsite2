@@ -139,7 +139,7 @@ let CONFIG = {
       day: '23', suffix: 'rd', weekday: 'Monday', month: 'November',
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
-      copy: 'An evening of dance, music, laughter, food and fun — come ready to celebrate under the stars.',
+      copy: 'An evening of dance, music, laughter, food and fun. Come ready to celebrate under the stars.',
       /* The ballroom film, as before the redesign: the still is the shut
          card's face and the film's poster; the film plays once it opens. */
       art: 'assets/cards/sangeet-still.jpg', theme: 'stars',
@@ -410,7 +410,7 @@ function renderStrings() {
   if (mon) mon.textContent = span ? span.month  : CONFIG.dates.scratchMonth;
   const fd = document.querySelector('[data-footer-date]');
   if (fd) fd.innerHTML = span ? span.footer : CONFIG.dates.footer;
-  document.title = `${CONFIG.couple.names} — ${CONFIG.couple.venue}`;
+  document.title = `${CONFIG.couple.names} | ${CONFIG.couple.venue}`;
 }
 
 /* ============================================================
@@ -809,10 +809,10 @@ function initRsvpForm() {
       form.elements.departure.focus();
       return;
     }
-    if (data.get('website')) { say('Thank you — we have your RSVP.', 'ok'); form.reset(); return; }
+    if (data.get('website')) { say('Thank you, we have your RSVP.', 'ok'); form.reset(); return; }
 
     const endpoint = (CONFIG.rsvpForm || {}).endpoint;
-    if (!endpoint) { say('Replies cannot be sent just yet — please call instead.', 'error'); return; }
+    if (!endpoint) { say('Replies cannot be sent just yet. Please call instead.', 'error'); return; }
 
     button.disabled = true;
     say('Sending…');
@@ -823,7 +823,7 @@ function initRsvpForm() {
         body: new URLSearchParams({ side: SIDE, name, phone, arrival, departure }),
       });
       form.reset();
-      say('Thank you — we have your RSVP.', 'ok');
+      say('Thank you, we have your RSVP.', 'ok');
     } catch (_) {
       say('That did not go through. Please check your connection and try again.', 'error');
     } finally {
