@@ -174,6 +174,13 @@ assert.match(script, /id: 'sangeet', title: 'Sangeet', teaser: 'The Wedding Juke
 assert.match(script, /id: 'wedding', title: 'Wedding', teaser: 'The Forever Affair'/);
 assert.match(script, /class="event-name">\$\{ev\.teaser \|\| ev\.title\}/);
 assert.match(script, /class="pop-name">\$\{ev\.title\}/);
+/* the teaser sits over the busiest part of each painting, so the shut card
+   lays a pool of its own ground behind the words, and drops it when open */
+for (const theme of ['marigold', 'stars', 'breeze']) {
+  assert.match(css, new RegExp('\\.event--' + theme + ' \\{[^}]*--scrim:'), theme + ' needs a scrim colour');
+}
+assert.match(css, /\.event::before \{[^}]*radial-gradient[^}]*var\(--scrim\)/s);
+assert.match(css, /\.event\.is-open::before \{ opacity: 0; \}/);
 /* "Tap to unfold" pinned absolute inside the summary landed on the date */
 assert.doesNotMatch(css, /\.event-open \{[^}]*position: absolute/s,
                     'Tap to unfold must stay in the flow under the date');
