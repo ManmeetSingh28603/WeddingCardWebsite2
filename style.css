@@ -761,6 +761,21 @@ html, body {
   background-repeat: no-repeat;
 }
 
+/* Sangeet and Wedding open onto a film. It sits over the still and is only
+   shown, and only played, while the card is open. */
+.event-film {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s ease;
+}
+.event.is-open .event-film { opacity: 1; }
+
 .event-summary { position: relative; z-index: 3; width: 100%; padding: 14px; }
 .event-name {
   margin: 0;

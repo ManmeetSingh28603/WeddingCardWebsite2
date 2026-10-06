@@ -115,10 +115,14 @@ let CONFIG = {
        dress  optional guest colour code, printed under the venue.
               The family asked for none, so no function sets it.
 
-     The art is the couple's own, from their announcement site. Each
-     painting leaves its top half clear for the wording and puts the couple
-     at the foot, so an opened card is the whole painting with the words
-     set in the sky. */
+       film   optional video that plays behind an opened card; its `art`
+              is then a still cut from it, shown shut and used as poster
+
+     Haldi is the couple's own painting, from their announcement site;
+     Sangeet and Wedding keep the films they had before the redesign. Each
+     picture leaves its top clear for the wording and puts the couple at
+     the foot, so an opened card is the whole picture with the words set
+     in its sky. */
   events: [
     {
       id: 'haldi', title: 'Haldi',
@@ -134,7 +138,10 @@ let CONFIG = {
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
       copy: 'An evening of dance, music, laughter, food and fun — come ready to celebrate under the stars.',
-      art: 'assets/cards/sangeet-card.jpg', theme: 'stars',
+      /* The ballroom film, as before the redesign: the still is the shut
+         card's face and the film's poster; the film plays once it opens. */
+      art: 'assets/cards/sangeet-still.jpg', theme: 'stars',
+      film: 'assets/video/sangeet-bg.mp4',
     },
     {
       id: 'wedding', title: 'Wedding',
@@ -142,7 +149,8 @@ let CONFIG = {
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
       copy: 'Join us for an evening of sacred vows, sparkling celebrations, music and love as we begin our forever together.',
-      art: 'assets/cards/wedding-card.jpg', theme: 'breeze',
+      art: 'assets/cards/wedding-still.jpg', theme: 'breeze',
+      film: 'assets/video/wedding-bg.mp4',
     },
   ],
 
@@ -186,10 +194,10 @@ let CONFIG = {
 
   /* The RSVP form posts to a Google Apps Script web app that appends a row
      to a Google Sheet — the script, and how to deploy it, are in
-     rsvp-sheet/Code.gs. Paste the web app's /exec URL here. While it is
-     empty the form still shows, but says it cannot send yet. */
+     rsvp-sheet/Code.gs. This is that web app's /exec URL. Empty, the form
+     still shows but says it cannot send yet. */
   rsvpForm: {
-    endpoint: '',
+    endpoint: 'https://script.google.com/macros/s/AKfycbyUbOvYqNQhsGt1NLB9_YPokUWV5a6aeuzJudBd0hCaxe5Z5rll-YABAoPsFksHTQaD/exec',
   },
 };
 
@@ -509,6 +517,13 @@ function renderEventCards() {
     /* `note` is optional: an empty one prints nothing at all rather than
        an empty row. */
     const note  = ev.note  ? `<p class="event-note">${ev.note}</p>` : '';
+    /* preload="none": a film is only wanted once its card opens, so a grid
+       of cards never pulls a video each on load. The still is the poster. */
+    const film  = ev.film
+      ? `<video class="event-film" src="${ev.film}" poster="${ev.art || ''}"
+                muted loop playsinline webkit-playsinline preload="none"
+                disablepictureinpicture aria-hidden="true"></video>`
+      : '';
     const when  = `${ev.day}<sup>${ev.suffix}</sup> ${ev.month}`;
     /* The couple's own name for a function goes on top; the function it
        actually is goes underneath it, in both the shut and opened card. */
@@ -531,6 +546,7 @@ function renderEventCards() {
 
     card.innerHTML =
       `<div class="event-art" aria-hidden="true"></div>
+       ${film}
        <div class="event-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
        <div class="event-summary">
          <h3 class="event-name">${ev.title}</h3>
@@ -584,6 +600,18 @@ function initEventCards() {
     document.body.classList.toggle('has-open-card', opening);
     card.setAttribute('aria-expanded', String(opening));
     openCard = opening ? card : null;
+
+    /* the film runs only while its card is open */
+    const film = card.querySelector('.event-film');
+    if (film) {
+      if (opening) {
+        try { film.currentTime = 0; } catch (_) {}
+        const p = film.play();
+        if (p && p.catch) p.catch(() => {});   /* the still stands in */
+      } else {
+        film.pause();
+      }
+    }
 
     const last = card.getBoundingClientRect();
     const dx = first.left - last.left;
@@ -965,8 +993,8 @@ function showMusicControl() {
 
 function initMusic() {
   bgAudio = document.getElementById('bgMusic');
-  /* The element carries no `loop`: looping natively would drop the play
-     head back to 0 and replay the 38-second intro every time round. */
+  /* The element carries no `loop`: the loop restarts at MUSIC_START, so a
+     song with an intro to skip skips it every time round, not just once. */
   if (bgAudio) {
     bgAudio.addEventListener('ended', () => {
       try { bgAudio.currentTime = MUSIC_START; bgAudio.play(); } catch (_) {}
@@ -1020,9 +1048,10 @@ function retryBgMusic() {
   startBgMusic();
 }
 
-/* Where the score comes in — the first 38 seconds of the track are an
-   intro nobody needs to sit through. */
-const MUSIC_START = 38;
+/* Where the score comes in, and where each loop restarts. The current
+   track (K.K. Cruisin') has no intro to skip, so it plays from the top;
+   a song with a long intro can be started later by raising this. */
+const MUSIC_START = 0;
 
 /* Start the score and reveal the toggle. Idempotent. On rejection, arm
    one-shot listeners on the trailing gesture events so the SAME tap — or
@@ -1031,9 +1060,6 @@ function startBgMusic() {
   if (!bgAudio || musicFailed || musicStarted) return;
   if (!bgAudio.paused) { musicStarted = true; return; }
   musicStarted = true;
-  /* The track opens on 38 seconds of intro; the song proper starts there,
-     and so does the invitation. `loop` on the element would send it back
-     to 0 and replay that intro, so the loop is handled below instead. */
   try { bgAudio.muted = false; bgAudio.volume = 1; bgAudio.currentTime = MUSIC_START; } catch (_) {}
   const p = bgAudio.play();
   if (p && p.catch) {

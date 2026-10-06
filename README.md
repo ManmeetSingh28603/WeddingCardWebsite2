@@ -122,7 +122,7 @@ Three things follow from that:
 
 **Copied from the couple's own announcement site,
 `https://majestic-melba-33846c.netlify.app`** — its fonts, palette, entrance,
-hero, olive Save the Dates panel, card paintings and closing. The details are
+hero, olive Save the Dates panel, Haldi painting and closing. The details are
 this card's own: lineage, scratch card, countdown, map, Blessings, RSVP.
 
 - **Type:** Italiana for the names and the door title; Cormorant Garamond for
@@ -135,9 +135,10 @@ this card's own: lineage, scratch card, countdown, map, Blessings, RSVP.
   pink.
 - **Artwork:** `assets/gate/royal-doors.jpg`, `assets/hero/floral-frame.jpg`
   (hero, Save the Dates, Blessings and footer all use it),
-  `assets/hero/gold-divider.svg`, and `assets/cards/{haldi,sangeet,wedding}-card.jpg`.
-  The two card PNGs from the site were 2.6–2.9 MB each and are re-encoded as
-  JPEG at the same size.
+  `assets/hero/gold-divider.svg` and `assets/cards/haldi-card.jpg` (re-encoded
+  from the site's 2.9 MB PNG as JPEG at the same size). **Sangeet and Wedding
+  keep their films** — `assets/video/{sangeet,wedding}-bg.mp4`, each with a
+  still in `assets/cards/` for its shut face — at the family's request.
 
 ## The entrance
 
@@ -150,8 +151,10 @@ replaced, and all its crop and skip logic, is gone.
 
 ## Save the dates
 
-Three cards on the olive panel, built from `CONFIG.events`. Each is one of
-the couple's paintings, in one of three colourways (`event--marigold`,
+Three cards on the olive panel, built from `CONFIG.events`. Haldi is the
+couple's painting; Sangeet and Wedding show a still from their film when shut
+and play the film once opened (`preload="none"`, so the grid never pulls a
+video on load). Each card has one of three colourways (`event--marigold`,
 `--stars`, `--breeze`) whose inks are taken card by card from the reference.
 Shut, a card shows the name, the date and "Tap to unfold". Tapping it grows it
 to a near full-height card with a FLIP — the card jumps to its opened
@@ -181,9 +184,10 @@ looks like a number and that departure is not before arrival.
 
 Replies go to a **Google Sheet**, through the Apps Script web app in
 [`rsvp-sheet/Code.gs`](rsvp-sheet/Code.gs) — its header says how to deploy
-it. Paste the web app's `/exec` URL into `CONFIG.rsvpForm.endpoint`. **Until
-then the form shows, but tells a guest it cannot send yet and to call
-instead.** Each row records which card it came from.
+it. Its `/exec` URL is set in `CONFIG.rsvpForm.endpoint`; emptied, the form
+still shows but tells a guest it cannot send and to call instead. Each row
+records which card it came from. **Redeploying the script as a new
+deployment changes the URL** — use Manage deployments → New version instead.
 
 - Apps Script sends no CORS headers, so the post is `no-cors`: the response
   is opaque, and the form can only tell a sent request from a network failure.
@@ -227,8 +231,9 @@ Everything the site loads lives in `assets/`, and nothing there is
 unreferenced. Root-level `*.mp4`, `*.mp3`, `*.jpg` and `*.jpeg` are
 gitignored, so working files dropped in the folder stay out of the repo.
 
-`music/ishq-hai.mp3` comes in at **0:38** — `MUSIC_START` in `script.js` — and
-the `<audio>` carries no `loop`, because looping natively would drop back to 0
-and replay the intro; the loop is re-seeded on `ended` instead. **It is the
-previous couple's track**; a different song needs `MUSIC_START` changed or
-removed, and deleting the file simply hides the music button.
+`music/kk-cruisin.mp3` is the score (K.K. Cruisin', True Remix). It is never
+autoplayed: it starts on the **Open invitation** press, inside the click, so
+browsers allow sound. It plays from the top — `MUSIC_START` in `script.js` is 0
+— and the loop restarts there on `ended` rather than with a native `loop`, so a
+future song with an intro to skip only needs that number raised. Deleting the
+file simply hides the music button.

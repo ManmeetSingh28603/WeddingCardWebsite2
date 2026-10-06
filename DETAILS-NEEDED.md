@@ -47,13 +47,14 @@ be entirely your own.
 
 | File | What it does | Notes |
 | --- | --- | --- |
-| `assets/music/ishq-hai.mp3` | The background score | **This is the song the other family chose.** It starts at 0:38 (`MUSIC_START` in `script.js`), which is tuned to this track — a different song needs that number changed or removed. Delete the file and the music button hides itself; nothing else breaks. |
+| `assets/video/sangeet-bg.mp4`, `wedding-bg.mp4` and their stills in `assets/cards/` | The Sangeet and Wedding cards | Kept from before the redesign, at your request. |
 | `assets/scratch/couple.webp` | The illustration of the couple under the scratch bar | The previous card's drawing, kept by choice. It is faceless and carries no names. Replace the file to change it. |
 | `assets/music/kamaicha.png`, `bow.png` | The artwork on the music button | Supplied to the previous project. |
 
 Everything else in `assets/` is **yours**, from your announcement site: the
-doors, the floral, the gold divider and the three card paintings. The gate
-film and the template's three card films have been removed.
+doors, the floral, the gold divider and the Haldi painting — plus the
+background song you chose, `assets/music/kk-cruisin.mp3`. The gate film and the
+Haldi film have been removed.
 
 ---
 

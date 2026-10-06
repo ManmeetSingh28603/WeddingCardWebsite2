@@ -17,14 +17,17 @@ for (const f of ['assets/gate/royal-doors.jpg',   // the entrance doors
                  'assets/hero/floral-frame.jpg',  // hero, schedule, blessings, footer
                  'assets/hero/gold-divider.svg',
                  'assets/cards/haldi-card.jpg',
-                 'assets/cards/sangeet-card.jpg',
-                 'assets/cards/wedding-card.jpg',
-                 'assets/music/ishq-hai.mp3']) {
+                 'assets/cards/sangeet-still.jpg',  // Sangeet and Wedding keep
+                 'assets/video/sangeet-bg.mp4',     // their films, each with
+                 'assets/cards/wedding-still.jpg',  // a still for its shut face
+                 'assets/video/wedding-bg.mp4',
+                 'assets/music/kk-cruisin.mp3']) {
   assert.ok(has(f), f + ' must exist');
 }
-/* ── and the gate film and template films it replaced are gone ── */
-assert.ok(!has('assets/video'), 'the gate and card films were replaced and must stay deleted');
-for (const f of ['assets/hero/floral_frame.webp', 'assets/hero/gate_poster.jpg']) {
+/* ── and what the redesign replaced is gone ── */
+for (const f of ['assets/video/gate.mp4', 'assets/video/haldi-mehendi-bg.mp4',
+                 'assets/music/ishq-hai.mp3',
+                 'assets/hero/floral_frame.webp', 'assets/hero/gate_poster.jpg']) {
   assert.ok(!has(f), f + ' was replaced and must stay deleted');
 }
 
@@ -129,7 +132,7 @@ for (const [name, page] of pages) {
 for (const [name, page] of pages) {
   assert.match(page, /class="door door-left"[\s\S]*class="door door-right"/, name + ' needs both doors');
   assert.match(page, /<button class="open-button" id="openInvitation"/, name + ' needs the open button');
-  assert.doesNotMatch(page, /<video/, name + ' must not carry a film any more');
+  assert.doesNotMatch(page, /<video/, name + ' must not carry a gate film any more');
 }
 assert.match(css, /\.door \{[^}]*background-image: url\("assets\/gate\/royal-doors\.jpg"\)/s);
 assert.match(css, /\.entrance\.is-open \.door-left  \{ transform: translateX\(-102%\); \}/);
@@ -144,21 +147,22 @@ for (const [name, page] of pages) {
 }
 assert.doesNotMatch(css, /Pinyon|--font-script/);
 
-/* ── the score: same track both sides, in at 0:38, and NOT natively looped
-      (native loop would drop back to 0 and replay the intro) ── */
+/* ── the score: same track both sides, looped from MUSIC_START by script
+      rather than natively, and never autoplayed: it starts on the open click ── */
 for (const [name, page] of pages) {
-  assert.match(page, /assets\/music\/ishq-hai\.mp3/, name + ' must use the score');
-  assert.doesNotMatch(page, /<audio[^>]*\sloop/, name + ' must not loop the audio natively');
+  assert.match(page, /<audio id="bgMusic" src="assets\/music\/kk-cruisin\.mp3"/, name + ' must use the score');
+  assert.doesNotMatch(page, /<audio[^>]*\s(loop|autoplay)/, name + ' must not loop or autoplay natively');
 }
-assert.match(script, /const MUSIC_START = 38;/);
+assert.match(script, /const MUSIC_START = 0;/);
 assert.match(script, /currentTime = MUSIC_START/);
 
-/* ── the three cards, each on the couple's own painting, in its own
-      colourway, and no films ── */
-assert.match(script, /art: 'assets\/cards\/haldi-card\.jpg', theme: 'marigold'/);
-assert.match(script, /art: 'assets\/cards\/sangeet-card\.jpg', theme: 'stars'/);
-assert.match(script, /art: 'assets\/cards\/wedding-card\.jpg', theme: 'breeze'/);
-assert.doesNotMatch(script, /film:|event-film|has-film/, 'the cards no longer carry films');
+/* ── the three cards: Haldi on the couple's painting, Sangeet and Wedding
+      on their films, each in its own colourway ── */
+assert.match(script, /art: 'assets\/cards\/haldi-card\.jpg', theme: 'marigold',\n(?!\s*film:)/);
+assert.match(script, /art: 'assets\/cards\/sangeet-still\.jpg', theme: 'stars',\s*film: 'assets\/video\/sangeet-bg\.mp4'/);
+assert.match(script, /art: 'assets\/cards\/wedding-still\.jpg', theme: 'breeze',\s*film: 'assets\/video\/wedding-bg\.mp4'/);
+assert.match(script, /preload="none"/, 'a grid of cards must not pull a video each on load');
+assert.match(css, /\.event\.is-open \.event-film \{ opacity: 1; \}/);
 for (const theme of ['marigold', 'stars', 'breeze']) {
   assert.match(css, new RegExp('\\.event--' + theme + ' \\{[^}]*--pop-top'), theme + ' needs its colourway');
 }
