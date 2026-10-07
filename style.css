@@ -1023,9 +1023,53 @@ body.has-open-card { overflow: hidden; }
 .event-sparks i:nth-child(5) { --x: 54%; --y: 34%; animation-delay: 3.1s; }
 .event-sparks i:nth-child(6) { --x: 22%; --y: 46%; animation-delay: 3.8s; }
 
+/* Haldi: marigolds and loose petals falling through the card, shut and
+   open alike, in the painting's own yellows and oranges. Odd children are
+   whole flowers (the reference's marigold: a dark eye, a gold ring, and
+   ruffled petals from a conic gradient); even ones are single petals.
+   Each falls by animating top, from above the card to below it, so the
+   distance is the card's own height however tall it is; the sway and spin
+   ride on transform. */
+.event--marigold .event-sparks { opacity: 1; overflow: hidden; }
 .event--marigold .event-sparks i {
-  background: radial-gradient(circle, #f3b526, rgba(243,181,38,0) 70%);
-  animation: sparkFloat 5.2s ease-in-out infinite;
+  top: -8%;
+  width: var(--s, 16px);
+  height: var(--s, 16px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #91442c 0 10%, #f5bc24 12% 24%, transparent 25%),
+    repeating-conic-gradient(#f6c52e 0 12deg, #e49b19 13deg 23deg);
+  filter: drop-shadow(0 2px 2px rgba(120,70,20,.25));
+  animation: marigoldFall var(--dur, 8s) linear infinite;
+}
+.event--marigold .event-sparks i:nth-child(even) {
+  width: calc(var(--s, 16px) * .6);
+  height: calc(var(--s, 16px) * .8);
+  border-radius: 70% 30% 70% 30%;
+  background: linear-gradient(135deg, #f7c531, #e8891a);
+}
+.event--marigold .event-sparks i:nth-child(1)  { --x: 8%;  --s: 18px; --dur: 9s;   animation-delay: -1s; }
+.event--marigold .event-sparks i:nth-child(2)  { --x: 16%; --s: 15px; --dur: 7s;   animation-delay: -4.5s; }
+.event--marigold .event-sparks i:nth-child(3)  { --x: 27%; --s: 14px; --dur: 10s;  animation-delay: -6s; }
+.event--marigold .event-sparks i:nth-child(4)  { --x: 35%; --s: 17px; --dur: 8s;   animation-delay: -2s; }
+.event--marigold .event-sparks i:nth-child(5)  { --x: 46%; --s: 20px; --dur: 11s;  animation-delay: -8s; }
+.event--marigold .event-sparks i:nth-child(6)  { --x: 55%; --s: 14px; --dur: 7.5s; animation-delay: -0.5s; }
+.event--marigold .event-sparks i:nth-child(7)  { --x: 63%; --s: 16px; --dur: 9.5s; animation-delay: -3.5s; }
+.event--marigold .event-sparks i:nth-child(8)  { --x: 71%; --s: 16px; --dur: 8.5s; animation-delay: -6.5s; }
+.event--marigold .event-sparks i:nth-child(9)  { --x: 80%; --s: 15px; --dur: 10.5s; animation-delay: -5s; }
+.event--marigold .event-sparks i:nth-child(10) { --x: 88%; --s: 13px; --dur: 7s;   animation-delay: -2.5s; }
+.event--marigold .event-sparks i:nth-child(11) { --x: 92%; --s: 17px; --dur: 9s;   animation-delay: -7.5s; }
+.event--marigold .event-sparks i:nth-child(12) { --x: 4%;  --s: 14px; --dur: 8s;   animation-delay: -5.5s; }
+.event--marigold .event-sparks i:nth-child(13) { --x: 40%; --s: 13px; --dur: 12s;  animation-delay: -10s; }
+.event--marigold .event-sparks i:nth-child(14) { --x: 76%; --s: 15px; --dur: 8s;   animation-delay: -0.2s; }
+@keyframes marigoldFall {
+  0%   { top: -8%;  opacity: 0;   transform: translateX(0)     rotate(0deg); }
+  8%   {            opacity: .95; }
+  25%  {                          transform: translateX(14px)  rotate(90deg); }
+  50%  {                          transform: translateX(-10px) rotate(180deg); }
+  75%  {                          transform: translateX(12px)  rotate(270deg); }
+  92%  {            opacity: .9; }
+  100% { top: 104%; opacity: 0;   transform: translateX(0)     rotate(360deg); }
 }
 .event--stars .event-sparks i {
   background: radial-gradient(circle, #fff7cd, rgba(255,247,205,0) 70%);
@@ -1036,11 +1080,6 @@ body.has-open-card { overflow: hidden; }
   border-radius: 70% 30% 70% 30%;
   background: linear-gradient(135deg, #e48ca6, #f5c8d1);
   animation: sparkDrift 6.4s linear infinite;
-}
-@keyframes sparkFloat {
-  0%   { opacity: 0; transform: translateY(8px) scale(.7); }
-  30%  { opacity: .9; }
-  100% { opacity: 0; transform: translateY(-46px) scale(1.25); }
 }
 @keyframes sparkTwinkle {
   0%, 100% { opacity: 0; transform: scale(.5); }

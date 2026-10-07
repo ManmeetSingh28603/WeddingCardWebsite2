@@ -160,9 +160,13 @@ assert.match(script, /currentTime = MUSIC_START/);
       on their films, each in its own colourway ── */
 assert.match(script, /art: 'assets\/cards\/haldi-card\.jpg', theme: 'marigold',\n(?!\s*film:)/);
 assert.match(script, /art: 'assets\/cards\/sangeet-still\.jpg', theme: 'stars',\s*film: 'assets\/video\/sangeet-bg\.mp4'/);
-assert.match(script, /art: 'assets\/cards\/wedding-still\.jpg', theme: 'breeze',[\s\S]{0,320}?film: 'assets\/video\/wedding-bg\.mp4', filmHold: 3\.9,/,
-             'the wedding film holds with its lights down (they rise again at ~4.2s)');
-assert.match(script, /\$\{ev\.filmHold \? '' : ' loop'\}/, 'a held film must not loop');
+assert.match(script, /art: 'assets\/cards\/wedding-still\.jpg', theme: 'breeze',[\s\S]{0,320}?film: 'assets\/video\/wedding-bg\.mp4', filmLoop: \[2\.0, 3\.9\],/,
+             'the wedding film loops only while its lights are down (they rise at ~4.2s)');
+const weddingLoop = script.match(/filmLoop: \[([\d.]+), ([\d.]+)\]/);
+assert.ok(Number(weddingLoop[2]) < 4.2, 'the loop must end before the lanterns start to rise');
+assert.match(script, /\$\{ev\.filmLoop \? '' : ' loop'\}/, 'a film with a loop stretch must not loop natively');
+assert.match(script, /requestVideoFrameCallback/, 'the loop end is checked every frame, not every 250ms');
+assert.doesNotMatch(script, /film\.pause\(\); film\.currentTime/, 'the wedding film must keep playing, not stop');
 assert.match(script, /preload="none"/, 'a grid of cards must not pull a video each on load');
 assert.match(css, /\.event\.is-open \.event-film \{ opacity: 1; \}/);
 for (const theme of ['marigold', 'stars', 'breeze']) {

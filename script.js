@@ -119,8 +119,8 @@ let CONFIG = {
 
        film   optional video that plays behind an opened card; its `art`
               is then a still cut from it, shown shut and used as poster
-       filmHold  optional second at which the film stops and holds,
-              instead of looping
+       filmLoop  optional [from, to] seconds: the film plays from the start
+              once, then loops only that stretch instead of the whole film
 
      Haldi is the couple's own painting, from their announcement site;
      Sangeet and Wedding keep the films they had before the redesign. Each
@@ -155,9 +155,10 @@ let CONFIG = {
       copy: 'Join us for an evening of sacred vows, sparkling celebrations, music and love as we begin our forever together.',
       art: 'assets/cards/wedding-still.jpg', theme: 'breeze',
       /* The lanterns and chandelier drop in during the first second and
-         rise out again at about 4.2s, so this film plays once and holds
-         at 3.9s, with everything hanging down, rather than looping. */
-      film: 'assets/video/wedding-bg.mp4', filmHold: 3.9,
+         rise out again at about 4.2s. So the film plays in once, then loops
+         2.0s–3.9s, where everything is hanging down, and never reaches the
+         rise. */
+      film: 'assets/video/wedding-bg.mp4', filmLoop: [2.0, 3.9],
     },
   ],
 
@@ -530,7 +531,7 @@ function renderEventCards() {
        of cards never pulls a video each on load. The still is the poster. */
     const film  = ev.film
       ? `<video class="event-film" src="${ev.film}" poster="${ev.art || ''}"
-                muted${ev.filmHold ? '' : ' loop'} playsinline webkit-playsinline preload="none"${ev.filmHold ? ` data-hold="${ev.filmHold}"` : ''}
+                muted${ev.filmLoop ? '' : ' loop'} playsinline webkit-playsinline preload="none"${ev.filmLoop ? ` data-loop="${ev.filmLoop.join(',')}"` : ''}
                 disablepictureinpicture aria-hidden="true"></video>`
       : '';
     const when  = `${ev.day}<sup>${ev.suffix}</sup> ${ev.month}`;
@@ -556,7 +557,7 @@ function renderEventCards() {
     card.innerHTML =
       `<div class="event-art" aria-hidden="true"></div>
        ${film}
-       <div class="event-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+       <div class="event-sparks" aria-hidden="true">${'<i></i>'.repeat(ev.theme === 'marigold' ? 14 : 6)}</div>
        <div class="event-summary">
          <h3 class="event-name">${ev.teaser || ev.title}</h3>
          ${alias}
@@ -616,15 +617,20 @@ function initEventCards() {
         try { film.currentTime = 0; } catch (_) {}
         const p = film.play();
         if (p && p.catch) p.catch(() => {});   /* the still stands in */
-        /* A held film stops on its chosen frame and stays there. timeupdate
-           only fires every ~250ms, so it is caught a little late and then
-           seeked back to the exact frame. */
-        const hold = parseFloat(film.dataset.hold);
-        if (hold && !film.dataset.holdWired) {
-          film.dataset.holdWired = '1';
-          film.addEventListener('timeupdate', () => {
-            if (film.currentTime >= hold) { film.pause(); film.currentTime = hold; }
-          });
+        /* A film with a loop stretch jumps back to its start whenever it
+           reaches the end. Checked every frame where the browser allows it
+           (requestVideoFrameCallback): timeupdate fires only every ~250ms,
+           late enough to show the frames the loop exists to skip. */
+        const [from, to] = (film.dataset.loop || '').split(',').map(Number);
+        if (to && !film.dataset.loopWired) {
+          film.dataset.loopWired = '1';
+          const check = () => { if (film.currentTime >= to) film.currentTime = from; };
+          if ('requestVideoFrameCallback' in film) {
+            const onFrame = () => { check(); film.requestVideoFrameCallback(onFrame); };
+            film.requestVideoFrameCallback(onFrame);
+          } else {
+            film.addEventListener('timeupdate', check);
+          }
         }
       } else {
         film.pause();

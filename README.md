@@ -154,9 +154,11 @@ replaced, and all its crop and skip logic, is gone.
 Three cards on the olive panel, built from `CONFIG.events`. Haldi is the
 couple's painting; Sangeet and Wedding show a still from their film when shut
 and play the film once opened (`preload="none"`, so the grid never pulls a
-video on load). Sangeet loops; Wedding sets `filmHold: 3.9` and stops there,
-because its lanterns and chandelier drop in during the first second and rise
-out again at about 4.2s. Each card has one of three colourways (`event--marigold`,
+video on load). Sangeet loops the whole film. Wedding sets `filmLoop: [2.0,
+3.9]`: its lanterns and chandelier drop in during the first second and rise
+out again at about 4.2s, so it plays in once and then loops only the stretch
+where everything hangs down, checked every frame so it never reaches the
+rise. Haldi has marigolds and petals falling through it, shut and open. Each card has one of three colourways (`event--marigold`,
 `--stars`, `--breeze`) whose inks are taken card by card from the reference.
 Shut, a card shows its **teaser name** — Golden Carnival, Wedding
 Jukebox, Forever Affair (`teaser` in `CONFIG.events`) — the date and "Tap
