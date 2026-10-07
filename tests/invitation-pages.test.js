@@ -21,7 +21,7 @@ for (const f of ['assets/gate/royal-doors.jpg',   // the entrance doors
                  'assets/video/sangeet-bg.mp4',     // their films, each with
                  'assets/cards/wedding-still.jpg',  // a still for its shut face
                  'assets/video/wedding-bg.mp4',
-                 'assets/music/kk-cruisin.mp3']) {
+                 'assets/music/bgm.mp3']) {
   assert.ok(has(f), f + ' must exist');
 }
 /* ── and what the redesign replaced is gone ── */
@@ -150,7 +150,7 @@ assert.doesNotMatch(css, /Pinyon|--font-script/);
 /* ── the score: same track both sides, looped from MUSIC_START by script
       rather than natively, and never autoplayed: it starts on the open click ── */
 for (const [name, page] of pages) {
-  assert.match(page, /<audio id="bgMusic" src="assets\/music\/kk-cruisin\.mp3"/, name + ' must use the score');
+  assert.match(page, /<audio id="bgMusic" src="assets\/music\/bgm\.mp3"/, name + ' must use the score');
   assert.doesNotMatch(page, /<audio[^>]*\s(loop|autoplay)/, name + ' must not loop or autoplay natively');
 }
 assert.match(script, /const MUSIC_START = 0;/);
@@ -160,7 +160,9 @@ assert.match(script, /currentTime = MUSIC_START/);
       on their films, each in its own colourway ── */
 assert.match(script, /art: 'assets\/cards\/haldi-card\.jpg', theme: 'marigold',\n(?!\s*film:)/);
 assert.match(script, /art: 'assets\/cards\/sangeet-still\.jpg', theme: 'stars',\s*film: 'assets\/video\/sangeet-bg\.mp4'/);
-assert.match(script, /art: 'assets\/cards\/wedding-still\.jpg', theme: 'breeze',\s*film: 'assets\/video\/wedding-bg\.mp4'/);
+assert.match(script, /art: 'assets\/cards\/wedding-still\.jpg', theme: 'breeze',[\s\S]{0,320}?film: 'assets\/video\/wedding-bg\.mp4', filmHold: 3\.9,/,
+             'the wedding film holds with its lights down (they rise again at ~4.2s)');
+assert.match(script, /\$\{ev\.filmHold \? '' : ' loop'\}/, 'a held film must not loop');
 assert.match(script, /preload="none"/, 'a grid of cards must not pull a video each on load');
 assert.match(css, /\.event\.is-open \.event-film \{ opacity: 1; \}/);
 for (const theme of ['marigold', 'stars', 'breeze']) {
@@ -169,9 +171,9 @@ for (const theme of ['marigold', 'stars', 'breeze']) {
 assert.match(script, /Tap to unfold/);
 
 /* ── shut, a card wears its teaser name; opened, its plain name ── */
-assert.match(script, /id: 'haldi', title: 'Haldi', teaser: 'The Yellow Affair'/);
-assert.match(script, /id: 'sangeet', title: 'Sangeet', teaser: 'The Wedding Jukebox'/);
-assert.match(script, /id: 'wedding', title: 'Wedding', teaser: 'The Forever Affair'/);
+assert.match(script, /id: 'haldi', title: 'Haldi', teaser: 'Golden Carnival'/);
+assert.match(script, /id: 'sangeet', title: 'Sangeet', teaser: 'Wedding Jukebox'/);
+assert.match(script, /id: 'wedding', title: 'Wedding', teaser: 'Forever Affair'/);
 assert.match(script, /class="event-name">\$\{ev\.teaser \|\| ev\.title\}/);
 assert.match(script, /class="pop-name">\$\{ev\.title\}/);
 /* the teaser sits over the busiest part of each painting, so the shut card

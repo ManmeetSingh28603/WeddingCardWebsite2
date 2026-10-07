@@ -119,6 +119,8 @@ let CONFIG = {
 
        film   optional video that plays behind an opened card; its `art`
               is then a still cut from it, shown shut and used as poster
+       filmHold  optional second at which the film stops and holds,
+              instead of looping
 
      Haldi is the couple's own painting, from their announcement site;
      Sangeet and Wedding keep the films they had before the redesign. Each
@@ -127,7 +129,7 @@ let CONFIG = {
      in its sky. */
   events: [
     {
-      id: 'haldi', title: 'Haldi', teaser: 'The Yellow Affair',
+      id: 'haldi', title: 'Haldi', teaser: 'Golden Carnival',
       day: '23', suffix: 'rd', weekday: 'Monday', month: 'November',
       time: '11:00 am onwards',
       at: { h: 11, min: 0 },
@@ -135,7 +137,7 @@ let CONFIG = {
       art: 'assets/cards/haldi-card.jpg', theme: 'marigold',
     },
     {
-      id: 'sangeet', title: 'Sangeet', teaser: 'The Wedding Jukebox',
+      id: 'sangeet', title: 'Sangeet', teaser: 'Wedding Jukebox',
       day: '23', suffix: 'rd', weekday: 'Monday', month: 'November',
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
@@ -146,13 +148,16 @@ let CONFIG = {
       film: 'assets/video/sangeet-bg.mp4',
     },
     {
-      id: 'wedding', title: 'Wedding', teaser: 'The Forever Affair',
+      id: 'wedding', title: 'Wedding', teaser: 'Forever Affair',
       day: '24', suffix: 'th', weekday: 'Tuesday', month: 'November',
       time: '7:00 pm onwards',
       at: { h: 19, min: 0 },
       copy: 'Join us for an evening of sacred vows, sparkling celebrations, music and love as we begin our forever together.',
       art: 'assets/cards/wedding-still.jpg', theme: 'breeze',
-      film: 'assets/video/wedding-bg.mp4',
+      /* The lanterns and chandelier drop in during the first second and
+         rise out again at about 4.2s, so this film plays once and holds
+         at 3.9s, with everything hanging down, rather than looping. */
+      film: 'assets/video/wedding-bg.mp4', filmHold: 3.9,
     },
   ],
 
@@ -525,7 +530,7 @@ function renderEventCards() {
        of cards never pulls a video each on load. The still is the poster. */
     const film  = ev.film
       ? `<video class="event-film" src="${ev.film}" poster="${ev.art || ''}"
-                muted loop playsinline webkit-playsinline preload="none"
+                muted${ev.filmHold ? '' : ' loop'} playsinline webkit-playsinline preload="none"${ev.filmHold ? ` data-hold="${ev.filmHold}"` : ''}
                 disablepictureinpicture aria-hidden="true"></video>`
       : '';
     const when  = `${ev.day}<sup>${ev.suffix}</sup> ${ev.month}`;
@@ -611,6 +616,16 @@ function initEventCards() {
         try { film.currentTime = 0; } catch (_) {}
         const p = film.play();
         if (p && p.catch) p.catch(() => {});   /* the still stands in */
+        /* A held film stops on its chosen frame and stays there. timeupdate
+           only fires every ~250ms, so it is caught a little late and then
+           seeked back to the exact frame. */
+        const hold = parseFloat(film.dataset.hold);
+        if (hold && !film.dataset.holdWired) {
+          film.dataset.holdWired = '1';
+          film.addEventListener('timeupdate', () => {
+            if (film.currentTime >= hold) { film.pause(); film.currentTime = hold; }
+          });
+        }
       } else {
         film.pause();
       }
@@ -1052,7 +1067,7 @@ function retryBgMusic() {
 }
 
 /* Where the score comes in, and where each loop restarts. The current
-   track (K.K. Cruisin') has no intro to skip, so it plays from the top;
+   track (assets/music/bgm.mp3) plays from the top;
    a song with a long intro can be started later by raising this. */
 const MUSIC_START = 0;
 

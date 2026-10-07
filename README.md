@@ -154,10 +154,12 @@ replaced, and all its crop and skip logic, is gone.
 Three cards on the olive panel, built from `CONFIG.events`. Haldi is the
 couple's painting; Sangeet and Wedding show a still from their film when shut
 and play the film once opened (`preload="none"`, so the grid never pulls a
-video on load). Each card has one of three colourways (`event--marigold`,
+video on load). Sangeet loops; Wedding sets `filmHold: 3.9` and stops there,
+because its lanterns and chandelier drop in during the first second and rise
+out again at about 4.2s. Each card has one of three colourways (`event--marigold`,
 `--stars`, `--breeze`) whose inks are taken card by card from the reference.
-Shut, a card shows its **teaser name** — The Yellow Affair, The Wedding
-Jukebox, The Forever Affair (`teaser` in `CONFIG.events`) — the date and "Tap
+Shut, a card shows its **teaser name** — Golden Carnival, Wedding
+Jukebox, Forever Affair (`teaser` in `CONFIG.events`) — the date and "Tap
 to unfold"; opened, it gives the plain name: Haldi, Sangeet, Wedding. Tapping it grows it
 to a near full-height card with a FLIP — the card jumps to its opened
 geometry, both boxes are measured, and only the inverse transform is animated
@@ -233,7 +235,7 @@ Everything the site loads lives in `assets/`, and nothing there is
 unreferenced. Root-level `*.mp4`, `*.mp3`, `*.jpg` and `*.jpeg` are
 gitignored, so working files dropped in the folder stay out of the repo.
 
-`music/kk-cruisin.mp3` is the score (K.K. Cruisin', True Remix). It is never
+`music/bgm.mp3` is the score. It is never
 autoplayed: it starts on the **Open invitation** press, inside the click, so
 browsers allow sound. It plays from the top — `MUSIC_START` in `script.js` is 0
 — and the loop restarts there on `ended` rather than with a native `loop`, so a

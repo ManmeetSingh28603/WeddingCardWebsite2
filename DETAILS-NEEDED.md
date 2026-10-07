@@ -53,7 +53,7 @@ be entirely your own.
 
 Everything else in `assets/` is **yours**, from your announcement site: the
 doors, the floral, the gold divider and the Haldi painting — plus the
-background song you chose, `assets/music/kk-cruisin.mp3`. The gate film and the
+background song you chose, `assets/music/bgm.mp3`. The gate film and the
 Haldi film have been removed.
 
 ---
