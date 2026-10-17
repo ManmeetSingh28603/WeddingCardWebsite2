@@ -227,9 +227,9 @@ const AMARAA = {
    Venue section below them carries the map. */
 const V_AMARAA = { name: AMARAA.name, city: 'Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl };
 const EVENT_VENUES = {
-  haldi:   V_AMARAA,
-  sangeet: V_AMARAA,
-  wedding: V_AMARAA,
+  haldi:   { name: AMARAA.name, city: 'Near pool side, Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl },
+  sangeet: { name: AMARAA.name, city: 'Banquet hall, Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl },
+  wedding: { name: AMARAA.name, city: 'Main lawn, Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl },
 };
 const SIDE_CONFIGS = {
   bride: {
