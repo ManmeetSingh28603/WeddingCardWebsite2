@@ -213,6 +213,12 @@ assert.match(script, /pop-dress-label">Guest colour code/);
 assert.match(css, /\.pop-dress \{/, 'the colour code row needs its own rule');
 assert.doesNotMatch(script, /^\s*dress: '/m, 'no function carries a colour code');
 
+/* ── each opened card names the spot first, then the farm and town ── */
+assert.match(script, /const AT_AMARAA = `\$\{AMARAA\.name\}, Arjunganj, Lucknow`;/);
+assert.match(script, /haldi:\s+\{ name: 'Near pool side', city: AT_AMARAA/);
+assert.match(script, /sangeet:\s+\{ name: 'Banquet hall',\s+city: AT_AMARAA/);
+assert.match(script, /wedding:\s+\{ name: 'Main lawn',\s+city: AT_AMARAA/);
+
 /* ── one venue, one pin, on BOTH cards — the two-venue split is over ── */
 assert.match(script, /lat: 26\.7993442, lng: 80\.9897956/, 'Amaraa Farms needs its pin');
 assert.match(script, /venue: AMARAA/);

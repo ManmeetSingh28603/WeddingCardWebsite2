@@ -222,14 +222,15 @@ const AMARAA = {
   lat: 26.7993442, lng: 80.9897956,
 };
 /* Every function is looked up here rather than derived from a side, so a
-   function that moves later only has to be named in this table. `city` is
-   simply the second line. The cards print no map link of their own: the
-   Venue section below them carries the map. */
-const V_AMARAA = { name: AMARAA.name, city: 'Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl };
+   function that moves later only has to be named in this table. On the
+   opened card `name` is the first line and `city` the second: the spot
+   within the farm on top, the farm and town under it. The cards print no
+   map link of their own: the Venue section below them carries the map. */
+const AT_AMARAA = `${AMARAA.name}, Arjunganj, Lucknow`;
 const EVENT_VENUES = {
-  haldi:   { name: AMARAA.name, city: 'Near pool side, Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl },
-  sangeet: { name: AMARAA.name, city: 'Banquet hall, Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl },
-  wedding: { name: AMARAA.name, city: 'Main lawn, Arjunganj, Lucknow', mapUrl: AMARAA.mapUrl },
+  haldi:   { name: 'Near pool side', city: AT_AMARAA, mapUrl: AMARAA.mapUrl },
+  sangeet: { name: 'Banquet hall',   city: AT_AMARAA, mapUrl: AMARAA.mapUrl },
+  wedding: { name: 'Main lawn',      city: AT_AMARAA, mapUrl: AMARAA.mapUrl },
 };
 const SIDE_CONFIGS = {
   bride: {
